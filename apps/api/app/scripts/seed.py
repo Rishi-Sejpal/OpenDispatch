@@ -25,10 +25,12 @@ from app.models import (  # noqa: E402
     AiracCycle,
     AiracImportStatus,
     Airport,
+    AuditLog,
     Airway,
     AirwaySegment,
     Fix,
     FixRole,
+    FlightPlan,
     Organization,
     OrganizationMember,
     Procedure,
@@ -141,6 +143,42 @@ def upsert_user(db) -> User:
             )
         user = db.get(User, auth_user.id)
         if user is None:
+            # A local row may exist from a previous local-only seed (a
+            # different uuid) but with the same email. Reconcile by
+            # rewriting the local row's id to the Supabase auth user id
+            # and migrating every foreign key so the two stay in sync
+            # going forward.
+            existing = db.scalar(select(User).where(User.email == email))
+            if existing is not None:
+                existing_id = existing.id
+                if existing_id != auth_user.id:
+                    db.execute(
+                        update(OrganizationMember)
+                        .where(OrganizationMember.user_id == existing_id)
+                        .values(user_id=auth_user.id)
+                    )
+                    db.execute(
+                        update(FlightPlan)
+                        .where(FlightPlan.created_by_id == existing_id)
+                        .values(created_by_id=auth_user.id)
+                    )
+                    db.execute(
+                        update(FlightPlan)
+                        .where(FlightPlan.dispatched_by_id == existing_id)
+                        .values(dispatched_by_id=auth_user.id)
+                    )
+                    db.execute(
+                        update(AuditLog)
+                        .where(AuditLog.actor_user_id == existing_id)
+                        .values(actor_user_id=auth_user.id)
+                    )
+                    existing.id = auth_user.id
+                existing.email = email
+                existing.full_name = settings.seed_user_name
+                existing.is_superuser = True
+                existing.is_email_verified = True
+                db.flush()
+                return existing
             user = User(
                 id=auth_user.id,
                 email=email,

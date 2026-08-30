@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,6 +27,21 @@ class Settings(BaseSettings):
         default="postgresql+psycopg://opendispatch:opendispatch@db:5432/opendispatch"
     )
     redis_url: str = Field(default="redis://redis:6379/0")
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalize_database_url(cls, value: str) -> str:
+        # SQLAlchemy 2.x resolves a bare ``postgresql://`` URL to the legacy
+        # psycopg2 driver, which is not installed in our image. Normalize
+        # anything that points at PostgreSQL without an explicit driver to
+        # the bundled psycopg (v3) driver so the app can connect.
+        if not value:
+            return value
+        if value.startswith("postgres://"):
+            value = "postgresql" + value[len("postgres"):]
+        if value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value[len("postgresql://"):]
+        return value
 
     # Legacy JWT settings are retained for backwards compatibility with any
     # tools that still emit locally-signed tokens. All current authentication
