@@ -74,7 +74,7 @@ COPY services /srv/opendispatch/services
 COPY packages /srv/opendispatch/packages
 COPY data /srv/opendispatch/data
 
-ENV PYTHONPATH=/srv/opendispatch:/srv/opendispatch/apps/api:/srv/opendispatch/services:/srv/opendispatch/packages
+ENV PYTHONPATH=/srv/opendispatch:/srv/opendispatch/apps/api:/srv/opendispatch/services:/srv/opendispatch/packages/aviation-units:/srv/opendispatch/packages/aviation-geometry:/srv/opendispatch/packages/shared-types
 
 # Make the project importable as `app`
 WORKDIR /srv/opendispatch/apps/api

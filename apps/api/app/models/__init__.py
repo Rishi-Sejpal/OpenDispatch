@@ -177,7 +177,15 @@ class OrganizationMember(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         PG_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"), nullable=False, default=UserRole.VIEWER)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(
+            UserRole,
+            name="user_role",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+        default=UserRole.VIEWER,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=_now)
 
     organization: Mapped[Organization] = relationship(back_populates="members")
@@ -197,7 +205,13 @@ class AiracCycle(Base):
     source: Mapped[str] = mapped_column(String(80), nullable=False, default="manual")
     version: Mapped[str] = mapped_column(String(32), nullable=False, default="1")
     import_status: Mapped[AiracImportStatus] = mapped_column(
-        Enum(AiracImportStatus, name="airac_import_status"), nullable=False, default=AiracImportStatus.PENDING
+        Enum(
+            AiracImportStatus,
+            name="airac_import_status",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+        default=AiracImportStatus.PENDING,
     )
     checksum: Mapped[str | None] = mapped_column(String(128), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -271,7 +285,15 @@ class Fix(Base):
     )
     ident: Mapped[str] = mapped_column(String(12), nullable=False, index=True)
     name: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    role: Mapped[FixRole] = mapped_column(Enum(FixRole, name="fix_role"), nullable=False, default=FixRole.WAYPOINT)
+    role: Mapped[FixRole] = mapped_column(
+        Enum(
+            FixRole,
+            name="fix_role",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+        default=FixRole.WAYPOINT,
+    )
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
     elevation_ft: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -336,7 +358,14 @@ class Procedure(Base):
         PG_UUID(as_uuid=True), ForeignKey("airports.id", ondelete="CASCADE"), nullable=False, index=True
     )
     name: Mapped[str] = mapped_column(String(80), nullable=False, index=True)  # e.g. "ARRIB"
-    kind: Mapped[ProcedureKind] = mapped_column(Enum(ProcedureKind, name="procedure_kind"), nullable=False)
+    kind: Mapped[ProcedureKind] = mapped_column(
+        Enum(
+            ProcedureKind,
+            name="procedure_kind",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+    )
     runway_ident: Mapped[str | None] = mapped_column(String(8), nullable=True, index=True)
     reference_fix_id: Mapped[uuid.UUID | None] = mapped_column(
         PG_UUID(as_uuid=True), ForeignKey("fixes.id", ondelete="SET NULL"), nullable=True
@@ -367,7 +396,14 @@ class ProcedureLeg(Base):
         PG_UUID(as_uuid=True), ForeignKey("procedure_transitions.id", ondelete="CASCADE"), nullable=True, index=True
     )
     sequence: Mapped[int] = mapped_column(Integer, nullable=False)
-    leg_type: Mapped[LegType] = mapped_column(Enum(LegType, name="leg_type"), nullable=False)
+    leg_type: Mapped[LegType] = mapped_column(
+        Enum(
+            LegType,
+            name="leg_type",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+    )
     fix_id: Mapped[uuid.UUID | None] = mapped_column(
         PG_UUID(as_uuid=True), ForeignKey("fixes.id", ondelete="SET NULL"), nullable=True
     )
@@ -483,7 +519,13 @@ class FlightPlan(Base):
         PG_UUID(as_uuid=True), ForeignKey("airac_cycles.id", ondelete="RESTRICT"), nullable=False, index=True
     )
     status: Mapped[FlightPlanStatus] = mapped_column(
-        Enum(FlightPlanStatus, name="flight_plan_status"), nullable=False, default=FlightPlanStatus.DRAFT
+        Enum(
+            FlightPlanStatus,
+            name="flight_plan_status",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+        default=FlightPlanStatus.DRAFT,
     )
     callsign: Mapped[str | None] = mapped_column(String(16), nullable=True)
     flight_number: Mapped[str | None] = mapped_column(String(16), nullable=True)
