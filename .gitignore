@@ -28,3 +28,4 @@ storage/*
 *.swp
 *.swo
 apps/web/node_modules
+*.tsbuildinfo
