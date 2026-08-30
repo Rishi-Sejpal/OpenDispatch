@@ -1,0 +1,112 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (lint + typecheck + tests + build)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.4
+        env:
+          POSTGRES_USER: opendispatch
+          POSTGRES_PASSWORD: opendispatch
+          POSTGRES_DB: opendispatch
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U opendispatch -d opendispatch"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['56379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://opendispatch:opendispatch@localhost:55432/opendispatch
+      REDIS_URL: redis://localhost:56379/0
+      JWT_SECRET: ci-secret-not-for-production-please-use-a-real-secret
+      APP_ENV: test
+      LOG_JSON: "false"
+      SEED_USER_EMAIL: dispatch@opendispatch.example.com
+      SEED_USER_PASSWORD: dispatch123!
+      SEED_USER_NAME: Dispatch Operator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install system deps (for WeasyPrint/GeoAlchemy)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential libpq-dev libgeos-dev libproj-dev libgdal-dev \
+            libpango-1.0-0 libpangoft2-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 \
+            libxml2 libxslt1.1 libjpeg62-turbo zlib1g fonts-liberation fonts-dejavu
+      - name: Install Python deps
+        working-directory: apps/api
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            fastapi==0.115.5 'uvicorn[standard]==0.32.1' \
+            pydantic==2.10.2 pydantic-settings==2.6.1 \
+            sqlalchemy==2.0.36 alembic==1.14.0 'psycopg[binary]==3.2.3' \
+            geoalchemy2==0.16.0 shapely==2.0.6 \
+            redis==5.2.0 celery==5.4.0 \
+            'python-jose[cryptography]==3.3.0' 'passlib[argon2]==1.7.4' \
+            argon2-cffi==23.1.0 python-multipart==0.0.20 \
+            email-validator==2.2.0 httpx==0.28.0 jinja2==3.1.4 \
+            weasyprint==63.1 structlog==24.4.0 pyyaml==6.0.2 numpy==2.2.0 \
+            pytest==8.3.4 pytest-asyncio==0.24.0 pytest-cov==6.0.0 \
+            ruff==0.8.1 mypy==1.13.0 faker==33.0.0 freezegun==1.5.1
+      - name: Lint
+        working-directory: apps/api
+        run: ruff check .
+      - name: Typecheck
+        working-directory: apps/api
+        env:
+          PYTHONPATH: .
+        run: mypy app
+      - name: Migrate
+        run: |
+          alembic -c apps/api/alembic.ini upgrade head
+      - name: Seed
+        run: |
+          PYTHONPATH=apps/api:services:packages/aviation-units:packages/aviation-geometry \
+            python -m app.scripts.seed
+      - name: Test
+        working-directory: apps/api
+        env:
+          PYTHONPATH: .
+        run: pytest tests/
+
+  frontend:
+    name: Frontend (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run build
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -f docker/api.Dockerfile -t opendispatch-api:ci .
