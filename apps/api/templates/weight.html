@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Weight Summary - {{ plan.callsign or '' }} {{ plan.departure_icao }}-{{ plan.arrival_icao }}</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  body { font-family: 'Liberation Sans', sans-serif; font-size: 10pt; }
+  h1 { font-size: 14pt; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border: 1px solid #777; padding: 4px 6px; text-align: left; }
+  th { background: #eee; }
+  .right { text-align: right; }
+  .small { font-size: 8pt; color: #555; }
+</style>
+</head>
+<body>
+  <h1>Weight & Balance Summary</h1>
+  <div class="small">Plan: {{ plan.id }} — {{ plan.departure_icao }} → {{ plan.arrival_icao }} — generated {{ format_iso(generated_at) }} UTC</div>
+  <table>
+    <tr><th>Item</th><th class="right">kg</th><th class="right">lb</th><th>Notes</th></tr>
+    <tr><td>OEW</td><td class="right">{{ '%.0f' % (weights.oew_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.oew_kg if weights else 0) * 2.2046) }}</td><td>Operating empty</td></tr>
+    <tr><td>Payload</td><td class="right">{{ '%.0f' % (weights.payload_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.payload_kg if weights else 0) * 2.2046) }}</td><td>Pax + cargo</td></tr>
+    <tr><td>ZFW</td><td class="right">{{ '%.0f' % (weights.zfw_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.zfw_kg if weights else 0) * 2.2046) }}</td><td>OEW + Payload</td></tr>
+    <tr><td>Takeoff Fuel</td><td class="right">{{ '%.0f' % (weights.takeoff_fuel_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.takeoff_fuel_kg if weights else 0) * 2.2046) }}</td><td>Block fuel</td></tr>
+    <tr><td>TOW</td><td class="right">{{ '%.0f' % (weights.tow_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.tow_kg if weights else 0) * 2.2046) }}</td><td>ZFW + fuel</td></tr>
+    <tr><td>Trip Fuel</td><td class="right">{{ '%.0f' % ((fuel.trip_kg if fuel else 0)) }}</td><td class="right">{{ '%.0f' % (((fuel.trip_kg if fuel else 0)) * 2.2046) }}</td><td>Climb + cruise + descent</td></tr>
+    <tr><td>Landing Fuel</td><td class="right">{{ '%.0f' % (weights.landing_fuel_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.landing_fuel_kg if weights else 0) * 2.2046) }}</td><td>At touchdown</td></tr>
+    <tr><td>LW</td><td class="right">{{ '%.0f' % (weights.lw_kg if weights else 0) }}</td><td class="right">{{ '%.0f' % ((weights.lw_kg if weights else 0) * 2.2046) }}</td><td>At touchdown</td></tr>
+  </table>
+  <div class="small">Limits: MTOW {{ '%.0f' % (aircraft_type.mtow_kg if aircraft_type else 0) }} kg, MZFW {{ '%.0f' % (aircraft_type.mzfw_kg if aircraft_type else 0) }} kg, MLW {{ '%.0f' % (aircraft_type.mlw_kg if aircraft_type else 0) }} kg, Fuel cap {{ '%.0f' % (aircraft_type.fuel_capacity_kg if aircraft_type else 0) }} kg.</div>
+</body>
+</html>

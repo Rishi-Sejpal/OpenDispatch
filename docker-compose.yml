@@ -1,0 +1,111 @@
+name: opendispatch
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-opendispatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opendispatch}
+      POSTGRES_DB: ${POSTGRES_DB:-opendispatch}
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opendispatch} -d ${POSTGRES_DB:-opendispatch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "56379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-opendispatch}:${POSTGRES_PASSWORD:-opendispatch}@db:5432/${POSTGRES_DB:-opendispatch}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please-use-a-long-random-string}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-3600}
+      JWT_REFRESH_TTL_SECONDS: ${JWT_REFRESH_TTL_SECONDS:-2592000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8000}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:8000}
+      WEB_PUBLIC_URL: ${WEB_PUBLIC_URL:-http://localhost:5173}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-/var/opendispatch/storage}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_JSON: ${LOG_JSON:-true}
+      APP_ENV: ${APP_ENV:-development}
+      SEED_USER_EMAIL: ${SEED_USER_EMAIL:-dispatch@opendispatch.local}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-dispatch123!}
+      SEED_USER_NAME: ${SEED_USER_NAME:-Dispatch Operator}
+    ports:
+      - "8000:8000"
+    volumes:
+      - storage:/var/opendispatch/storage
+      - ./data:/srv/opendispatch/data:ro
+      - ./services:/srv/opendispatch/services:ro
+      - ./packages:/srv/opendispatch/packages:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-opendispatch}:${POSTGRES_PASSWORD:-opendispatch}@db:5432/${POSTGRES_DB:-opendispatch}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please-use-a-long-random-string}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_JSON: ${LOG_JSON:-true}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-/var/opendispatch/storage}
+    command: ["celery", "-A", "app.worker.celery_app", "worker", "-l", "INFO", "--concurrency=2"]
+    volumes:
+      - storage:/var/opendispatch/storage
+      - ./data:/srv/opendispatch/data:ro
+
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    depends_on:
+      - api
+    environment:
+      VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000/api/v1}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/web:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  pgdata:
+  redisdata:
+  storage:

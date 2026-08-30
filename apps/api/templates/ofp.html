@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Operational Flight Plan - {{ plan.callsign or '' }} {{ plan.departure_icao }}-{{ plan.arrival_icao }}</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  body { font-family: 'Liberation Sans', 'Helvetica', sans-serif; font-size: 9pt; color: #111; }
+  h1 { font-size: 14pt; margin: 0 0 4px 0; }
+  h2 { font-size: 10pt; margin: 8px 0 4px 0; border-bottom: 1px solid #444; padding-bottom: 2px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+  th, td { border: 1px solid #777; padding: 3px 5px; text-align: left; vertical-align: top; }
+  th { background: #eee; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .box { border: 1px solid #444; padding: 6px; }
+  .label { font-weight: bold; }
+  .small { font-size: 8pt; color: #555; }
+  .warning { color: #b00; }
+  .info { color: #06c; }
+  .error { color: #b00; font-weight: bold; }
+  .critical { background: #fee; }
+  .footer { font-size: 8pt; color: #666; margin-top: 8px; }
+  .badge { display: inline-block; padding: 1px 6px; background: #333; color: white; border-radius: 3px; font-size: 8pt; }
+</style>
+</head>
+<body>
+  <h1>Operational Flight Plan</h1>
+  <div class="grid-3 small">
+    <div><span class="label">Generated:</span> {{ format_iso(generated_at) }} UTC</div>
+    <div><span class="label">Template:</span> v{{ template_version }}</div>
+    <div><span class="label">Engine:</span> v{{ plan.calculation_engine_version }}</div>
+  </div>
+  <div class="grid-3 small">
+    <div><span class="label">Plan ID:</span> {{ plan.id }}</div>
+    <div><span class="label">Status:</span> <span class="badge">{{ plan.status.value }}</span></div>
+    <div><span class="label">AIRAC Cycle:</span> {{ cycle.cycle if cycle else '?' }}</div>
+  </div>
+
+  <h2>Flight Identification</h2>
+  <div class="grid-3">
+    <div class="box"><span class="label">Callsign:</span> {{ plan.callsign or '' }}</div>
+    <div class="box"><span class="label">Flight #:</span> {{ plan.flight_number or '' }}</div>
+    <div class="box"><span class="label">Date:</span> {{ format_iso(plan.scheduled_off_block) }}</div>
+  </div>
+
+  <h2>Route</h2>
+  <div class="grid-2">
+    <div class="box">
+      <div><span class="label">Departure:</span> {{ departure.icao if departure else plan.departure_icao }} — {{ departure.name if departure else '' }}</div>
+      <div><span class="label">Runway:</span> {{ plan.departure_runway_ident or '—' }}</div>
+      <div><span class="label">SID:</span> {{ plan.sid_id or '—' }}</div>
+    </div>
+    <div class="box">
+      <div><span class="label">Destination:</span> {{ arrival.icao if arrival else plan.arrival_icao }} — {{ arrival.name if arrival else '' }}</div>
+      <div><span class="label">Runway:</span> {{ plan.arrival_runway_ident or '—' }}</div>
+      <div><span class="label">STAR:</span> {{ plan.star_id or '—' }} / Approach: {{ plan.approach_id or '—' }}</div>
+    </div>
+  </div>
+  <div class="box">
+    <div class="label">Route:</div>
+    <div>{{ plan.route_text or 'DCT' }}</div>
+  </div>
+  <div class="box small">
+    <span class="label">Alternates:</span>
+    {% for a in alternates %}<span>{{ a.icao }} ({{ a.name }})</span>{% if not loop.last %}, {% endif %}{% endfor %}
+    {% if not alternates %}None{% endif %}
+  </div>
+
+  <h2>Aircraft</h2>
+  <div class="grid-3">
+    <div class="box"><span class="label">Type:</span> {{ aircraft_type.icao_type if aircraft_type else '—' }} ({{ aircraft_type.manufacturer if aircraft_type else '' }} {{ aircraft_type.model if aircraft_type else '' }})</div>
+    <div class="box"><span class="label">Registration:</span> {{ registration.registration if registration else '—' }}</div>
+    <div class="box"><span class="label">Perf Version:</span> {{ plan.aircraft_performance_version or '—' }}</div>
+  </div>
+
+  <h2>Cruise & Performance</h2>
+  <div class="grid-3">
+    <div class="box"><span class="label">Cruise Altitude:</span> FL{{ (plan.cruise_altitude_ft // 100) }}</div>
+    <div class="box"><span class="label">Cost Index:</span> {{ plan.cost_index }}</div>
+    <div class="box"><span class="label">Avg GS:</span> {{ '%.0f' % (calculation.average_ground_speed_kts if calculation else 0) }} kt</div>
+  </div>
+  <div class="grid-3">
+    <div class="box"><span class="label">Distance:</span> {{ '%.1f' % (calculation.total_distance_nm if calculation else 0) }} NM</div>
+    <div class="box"><span class="label">ETE:</span> {{ fmt_duration(calculation.estimated_time_enroute_seconds if calculation else 0) }}</div>
+    <div class="box"><span class="label">Passengers / Cargo:</span> {{ plan.passengers }} / {{ '%.0f' % plan.cargo_kg }} kg</div>
+  </div>
+
+  <h2>Fuel</h2>
+  <table>
+    <tr><th>Item</th><th>Mass (kg)</th><th>Mass (lb)</th><th>Notes</th></tr>
+    <tr><td>Taxi</td><td>{{ '%.0f' % (fuel.taxi_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.taxi_kg if fuel else 0) * 2.2046) }}</td><td>Ground operations</td></tr>
+    <tr><td>Trip</td><td>{{ '%.0f' % (fuel.trip_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.trip_kg if fuel else 0) * 2.2046) }}</td><td>Climb + Cruise + Descent</td></tr>
+    <tr><td>Contingency</td><td>{{ '%.0f' % (fuel.contingency_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.contingency_kg if fuel else 0) * 2.2046) }}</td><td>{{ '%.0f' % ((plan.fuel_policy.get('contingency_percent', 0.05) * 100)) }}% of trip</td></tr>
+    <tr><td>Alternate</td><td>{{ '%.0f' % (fuel.alternate_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.alternate_kg if fuel else 0) * 2.2046) }}</td><td>To alternate + approach</td></tr>
+    <tr><td>Final Reserve</td><td>{{ '%.0f' % (fuel.final_reserve_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.final_reserve_kg if fuel else 0) * 2.2046) }}</td><td>{{ plan.fuel_policy.get('final_reserve_minutes', 30) }} min hold</td></tr>
+    <tr><td>Additional</td><td>{{ '%.0f' % (fuel.additional_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.additional_kg if fuel else 0) * 2.2046) }}</td><td>Operator request</td></tr>
+    <tr><td>Extra</td><td>{{ '%.0f' % (fuel.extra_kg if fuel else 0) }}</td><td>{{ '%.0f' % ((fuel.extra_kg if fuel else 0) * 2.2046) }}</td><td>Discretionary</td></tr>
+    <tr><th>BLOCK FUEL</th><th>{{ '%.0f' % (fuel.block_kg if fuel else 0) }}</th><th>{{ '%.0f' % ((fuel.block_kg if fuel else 0) * 2.2046) }}</th><th>Total at start</th></tr>
+  </table>
+
+  <h2>Weights</h2>
+  <table>
+    <tr><th>Item</th><th>kg</th><th>lb</th></tr>
+    <tr><td>OEW</td><td>{{ '%.0f' % (weights.oew_kg if weights else 0) }}</td><td>{{ '%.0f' % ((weights.oew_kg if weights else 0) * 2.2046) }}</td></tr>
+    <tr><td>Payload</td><td>{{ '%.0f' % (weights.payload_kg if weights else 0) }}</td><td>{{ '%.0f' % ((weights.payload_kg if weights else 0) * 2.2046) }}</td></tr>
+    <tr><td>ZFW</td><td>{{ '%.0f' % (weights.zfw_kg if weights else 0) }}</td><td>{{ '%.0f' % ((weights.zfw_kg if weights else 0) * 2.2046) }}</td></tr>
+    <tr><td>TOW</td><td>{{ '%.0f' % (weights.tow_kg if weights else 0) }}</td><td>{{ '%.0f' % ((weights.tow_kg if weights else 0) * 2.2046) }}</td></tr>
+    <tr><td>LW</td><td>{{ '%.0f' % (weights.lw_kg if weights else 0) }}</td><td>{{ '%.0f' % ((weights.lw_kg if weights else 0) * 2.2046) }}</td></tr>
+  </table>
+
+  <h2>Warnings</h2>
+  {% if warnings %}
+  <table>
+    <tr><th>Severity</th><th>Code</th><th>Message</th></tr>
+    {% for w in warnings %}
+    <tr class="{{ w.severity.lower() }}">
+      <td>{{ w.severity }}</td>
+      <td>{{ w.code }}</td>
+      <td>{{ w.message }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="box">No warnings.</div>
+  {% endif %}
+
+  <div class="footer">
+    This is a planning estimate produced by OpenDispatch and is not a substitute for
+    certified aircraft performance data, official navigation data, ATC clearance,
+    or legally required dispatch systems. Always cross-check against approved
+    sources before flight.
+  </div>
+</body>
+</html>

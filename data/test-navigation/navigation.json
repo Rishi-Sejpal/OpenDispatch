@@ -1,0 +1,310 @@
+{
+  "_meta": {
+    "name": "OpenDispatch test navigation fixture (Indian subcontinent subset)",
+    "description": "Small, deterministic, open-source-friendly test dataset for development and CI. NOT FOR OPERATIONAL USE. Real coordinates are sourced from publicly available reference information for major airports; procedures and airways are simplified and synthetic.",
+    "cycle": "2401",
+    "scope": "VABB, VOMM, VIDP, VABO, VABP, VABV, VOML, VOPB, airways A466/A791, fixes along the way"
+  },
+  "airports": [
+    {
+      "icao": "VABB",
+      "iata": "BOM",
+      "name": "Chhatrapati Shivaji Maharaj International Airport",
+      "city": "Mumbai",
+      "country": "India",
+      "region": "Maharashtra",
+      "latitude": 19.0887,
+      "longitude": 72.8679,
+      "elevation_ft": 39,
+      "magnetic_variation": -0.7,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "09", "reciprocal_ident": "27", "length_ft": 10800, "width_ft": 197, "heading_deg": 89, "surface": "ASP", "elevation_ft": 26, "ils_available": true, "ils_category": "II", "lighting": true},
+        {"ident": "14", "reciprocal_ident": "32", "length_ft": 9500, "width_ft": 197, "heading_deg": 134, "surface": "ASP", "elevation_ft": 39, "ils_available": true, "ils_category": "I", "lighting": true},
+        {"ident": "27", "reciprocal_ident": "09", "length_ft": 10800, "width_ft": 197, "heading_deg": 269, "surface": "ASP", "elevation_ft": 26, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VIDP",
+      "iata": "DEL",
+      "name": "Indira Gandhi International Airport",
+      "city": "Delhi",
+      "country": "India",
+      "region": "Delhi",
+      "latitude": 28.5562,
+      "longitude": 77.1000,
+      "elevation_ft": 777,
+      "magnetic_variation": -0.4,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "09L", "reciprocal_ident": "27R", "length_ft": 13000, "width_ft": 197, "heading_deg": 90, "surface": "ASP", "elevation_ft": 777, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09R", "reciprocal_ident": "27L", "length_ft": 12500, "width_ft": 197, "heading_deg": 90, "surface": "ASP", "elevation_ft": 765, "ils_available": true, "ils_category": "II", "lighting": true},
+        {"ident": "10", "reciprocal_ident": "28", "length_ft": 14500, "width_ft": 197, "heading_deg": 100, "surface": "ASP", "elevation_ft": 750, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "27R", "reciprocal_ident": "09L", "length_ft": 13000, "width_ft": 197, "heading_deg": 270, "surface": "ASP", "elevation_ft": 777, "ils_available": true, "ils_category": "II", "lighting": true},
+        {"ident": "27L", "reciprocal_ident": "09R", "length_ft": 12500, "width_ft": 197, "heading_deg": 270, "surface": "ASP", "elevation_ft": 765, "ils_available": true, "ils_category": "I", "lighting": true},
+        {"ident": "28", "reciprocal_ident": "10", "length_ft": 14500, "width_ft": 197, "heading_deg": 280, "surface": "ASP", "elevation_ft": 750, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VOMM",
+      "iata": "MAA",
+      "name": "Chennai International Airport",
+      "city": "Chennai",
+      "country": "India",
+      "region": "Tamil Nadu",
+      "latitude": 12.9900,
+      "longitude": 80.1693,
+      "elevation_ft": 52,
+      "magnetic_variation": -1.4,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "07", "reciprocal_ident": "25", "length_ft": 12000, "width_ft": 197, "heading_deg": 75, "surface": "ASP", "elevation_ft": 52, "ils_available": true, "ils_category": "II", "lighting": true},
+        {"ident": "25", "reciprocal_ident": "07", "length_ft": 12000, "width_ft": 197, "heading_deg": 255, "surface": "ASP", "elevation_ft": 52, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VABO",
+      "iata": null,
+      "name": "Vadodara Airport",
+      "city": "Vadodara",
+      "country": "India",
+      "region": "Gujarat",
+      "latitude": 22.3362,
+      "longitude": 73.2263,
+      "elevation_ft": 127,
+      "magnetic_variation": -0.5,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "04", "reciprocal_ident": "22", "length_ft": 8000, "width_ft": 150, "heading_deg": 40, "surface": "ASP", "elevation_ft": 127, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VABP",
+      "iata": null,
+      "name": "Bhopal Airport",
+      "city": "Bhopal",
+      "country": "India",
+      "region": "Madhya Pradesh",
+      "latitude": 23.2875,
+      "longitude": 77.3374,
+      "elevation_ft": 1719,
+      "magnetic_variation": -0.4,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "06", "reciprocal_ident": "24", "length_ft": 9000, "width_ft": 150, "heading_deg": 60, "surface": "ASP", "elevation_ft": 1719, "ils_available": false, "lighting": true},
+        {"ident": "12", "reciprocal_ident": "30", "length_ft": 6500, "width_ft": 150, "heading_deg": 120, "surface": "ASP", "elevation_ft": 1719, "ils_available": false, "lighting": true}
+      ]
+    },
+    {
+      "icao": "VABV",
+      "iata": null,
+      "name": "Surat Airport",
+      "city": "Surat",
+      "country": "India",
+      "region": "Gujarat",
+      "latitude": 21.1141,
+      "longitude": 72.7417,
+      "elevation_ft": 50,
+      "magnetic_variation": -0.6,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "04", "reciprocal_ident": "22", "length_ft": 7500, "width_ft": 150, "heading_deg": 40, "surface": "ASP", "elevation_ft": 50, "ils_available": false, "lighting": true}
+      ]
+    },
+    {
+      "icao": "VOML",
+      "iata": null,
+      "name": "Mangalore International Airport",
+      "city": "Mangalore",
+      "country": "India",
+      "region": "Karnataka",
+      "latitude": 12.9611,
+      "longitude": 74.8900,
+      "elevation_ft": 337,
+      "magnetic_variation": -1.6,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "09", "reciprocal_ident": "27", "length_ft": 8000, "width_ft": 150, "heading_deg": 90, "surface": "ASP", "elevation_ft": 337, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VOPB",
+      "iata": null,
+      "name": "Visakhapatnam Airport",
+      "city": "Visakhapatnam",
+      "country": "India",
+      "region": "Andhra Pradesh",
+      "latitude": 17.7212,
+      "longitude": 83.2245,
+      "elevation_ft": 15,
+      "magnetic_variation": -1.0,
+      "timezone": "Asia/Kolkata",
+      "runways": [
+        {"ident": "10", "reciprocal_ident": "28", "length_ft": 10500, "width_ft": 197, "heading_deg": 100, "surface": "ASP", "elevation_ft": 15, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    }
+  ],
+  "fixes": [
+    { "ident": "BOM", "role": "WAYPOINT", "name": "Mumbai VOR", "latitude": 19.0000, "longitude": 72.8000, "region": "IN" },
+    { "ident": "GADIN", "role": "WAYPOINT", "latitude": 22.5000, "longitude": 73.5000, "region": "IN" },
+    { "ident": "DAMEN", "role": "WAYPOINT", "latitude": 24.0000, "longitude": 74.0000, "region": "IN" },
+    { "ident": "URKAL", "role": "WAYPOINT", "latitude": 25.5000, "longitude": 75.0000, "region": "IN" },
+    { "ident": "BPL", "role": "WAYPOINT", "name": "Bhopal VOR", "latitude": 23.2875, "longitude": 77.3374, "region": "IN" },
+    { "ident": "DEL", "role": "WAYPOINT", "name": "Delhi VOR", "latitude": 28.5562, "longitude": 77.1000, "region": "IN" },
+    { "ident": "RAJAI", "role": "WAYPOINT", "latitude": 27.5000, "longitude": 76.5000, "region": "IN" },
+    { "ident": "LURGI", "role": "WAYPOINT", "latitude": 26.0000, "longitude": 75.5000, "region": "IN" },
+    { "ident": "MAARA", "role": "WAYPOINT", "latitude": 21.0000, "longitude": 72.5000, "region": "IN" },
+    { "ident": "MAA", "role": "WAYPOINT", "name": "Chennai VOR", "latitude": 12.9900, "longitude": 80.1693, "region": "IN" },
+    { "ident": "MMV", "role": "WAYPOINT", "name": "Mangalore VOR", "latitude": 12.9611, "longitude": 74.8900, "region": "IN" },
+    { "ident": "VSK", "role": "WAYPOINT", "name": "Visakhapatnam VOR", "latitude": 17.7212, "longitude": 83.2245, "region": "IN" },
+    { "ident": "BIRD", "role": "WAYPOINT", "latitude": 15.0000, "longitude": 78.0000, "region": "IN" },
+    { "ident": "OPAMO", "role": "WAYPOINT", "latitude": 14.0000, "longitude": 77.0000, "region": "IN" }
+  ],
+  "airways": [
+    {
+      "ident": "A466",
+      "name": "Airway A466",
+      "type": "U",
+      "segments": [
+        { "from": "BOM", "to": "GADIN" },
+        { "from": "GADIN", "to": "DAMEN" },
+        { "from": "DAMEN", "to": "URKAL" },
+        { "from": "URKAL", "to": "BPL" },
+        { "from": "BPL", "to": "DEL" }
+      ]
+    },
+    {
+      "ident": "A791",
+      "name": "Airway A791",
+      "type": "U",
+      "segments": [
+        { "from": "BOM", "to": "MAARA" },
+        { "from": "MAARA", "to": "OPAMO" },
+        { "from": "OPAMO", "to": "BIRD" },
+        { "from": "BIRD", "to": "MAA" }
+      ]
+    },
+    {
+      "ident": "L301",
+      "name": "Airway L301",
+      "type": "U",
+      "segments": [
+        { "from": "BOM", "to": "LURGI" },
+        { "from": "LURGI", "to": "RAJAI" },
+        { "from": "RAJAI", "to": "DEL" }
+      ]
+    }
+  ],
+  "procedures": [
+    {
+      "airport": "VABB",
+      "name": "KABSO",
+      "kind": "SID",
+      "runway": "27",
+      "transitions": ["ALL"],
+      "reference_fix": "GADIN",
+      "legs": [
+        { "leg_type": "TF", "fix": "BOM", "course_deg": 269, "distance_nm": 5 },
+        { "leg_type": "TF", "fix": "GADIN", "course_deg": 35, "distance_nm": 200, "altitude_ft": 14000 }
+      ]
+    },
+    {
+      "airport": "VABB",
+      "name": "KAMOL",
+      "kind": "SID",
+      "runway": "09",
+      "transitions": ["ALL"],
+      "reference_fix": "MAARA",
+      "legs": [
+        { "leg_type": "TF", "fix": "BOM", "course_deg": 89, "distance_nm": 5 },
+        { "leg_type": "TF", "fix": "MAARA", "course_deg": 180, "distance_nm": 180, "altitude_ft": 14000 }
+      ]
+    },
+    {
+      "airport": "VIDP",
+      "name": "DELHI",
+      "kind": "STAR",
+      "runway": null,
+      "transitions": ["URKAL", "RAJAI", "BPL"],
+      "reference_fix": "DEL",
+      "legs": [
+        { "leg_type": "IF", "fix": "URKAL", "altitude_ft": 28000 },
+        { "leg_type": "TF", "fix": "BPL", "course_deg": 60, "distance_nm": 130 },
+        { "leg_type": "TF", "fix": "DEL", "course_deg": 25, "distance_nm": 360, "altitude_ft": 8000 }
+      ]
+    },
+    {
+      "airport": "VIDP",
+      "name": "DELHI2",
+      "kind": "STAR",
+      "runway": null,
+      "transitions": ["URKAL", "RAJAI"],
+      "reference_fix": "DEL",
+      "legs": [
+        { "leg_type": "IF", "fix": "URKAL", "altitude_ft": 32000 },
+        { "leg_type": "TF", "fix": "RAJAI", "course_deg": 30, "distance_nm": 130 },
+        { "leg_type": "TF", "fix": "DEL", "course_deg": 15, "distance_nm": 80, "altitude_ft": 8000 }
+      ]
+    },
+    {
+      "airport": "VIDP",
+      "name": "ILS28",
+      "kind": "APPROACH",
+      "runway": "28",
+      "transitions": ["ALL"],
+      "reference_fix": "DEL",
+      "legs": [
+        { "leg_type": "IF", "fix": "DEL", "altitude_ft": 6000 },
+        { "leg_type": "TF", "fix": "RAJAI", "course_deg": 280, "distance_nm": 50 }
+      ]
+    },
+    {
+      "airport": "VIDP",
+      "name": "ILS27R",
+      "kind": "APPROACH",
+      "runway": "27R",
+      "transitions": ["ALL"],
+      "reference_fix": "DEL",
+      "legs": [
+        { "leg_type": "IF", "fix": "DEL", "altitude_ft": 6000 },
+        { "leg_type": "TF", "fix": "RAJAI", "course_deg": 270, "distance_nm": 50 }
+      ]
+    },
+    {
+      "airport": "VOMM",
+      "name": "KOLLI",
+      "kind": "SID",
+      "runway": "07",
+      "transitions": ["ALL"],
+      "reference_fix": "MMV",
+      "legs": [
+        { "leg_type": "TF", "fix": "MAA", "course_deg": 75, "distance_nm": 5 },
+        { "leg_type": "TF", "fix": "MMV", "course_deg": 270, "distance_nm": 360, "altitude_ft": 14000 }
+      ]
+    },
+    {
+      "airport": "VOMM",
+      "name": "R1961",
+      "kind": "STAR",
+      "runway": null,
+      "transitions": ["MAA", "BIRD"],
+      "reference_fix": "MAA",
+      "legs": [
+        { "leg_type": "IF", "fix": "BIRD", "altitude_ft": 18000 },
+        { "leg_type": "TF", "fix": "MAA", "course_deg": 90, "distance_nm": 320 }
+      ]
+    },
+    {
+      "airport": "VOMM",
+      "name": "ILS07",
+      "kind": "APPROACH",
+      "runway": "07",
+      "transitions": ["ALL"],
+      "reference_fix": "MAA",
+      "legs": [
+        { "leg_type": "IF", "fix": "MAA", "altitude_ft": 4000 },
+        { "leg_type": "TF", "fix": "BIRD", "course_deg": 75, "distance_nm": 50 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Navigation Log - {{ plan.callsign or '' }} {{ plan.departure_icao }}-{{ plan.arrival_icao }}</title>
+<style>
+  @page { size: A4 landscape; margin: 8mm; }
+  body { font-family: 'Liberation Sans', sans-serif; font-size: 8pt; }
+  h1 { font-size: 12pt; margin: 0 0 4px 0; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #777; padding: 2px 4px; text-align: right; }
+  th { background: #eee; }
+  th.left, td.left { text-align: left; }
+  .footer { font-size: 7pt; color: #555; margin-top: 6px; }
+</style>
+</head>
+<body>
+  <h1>Navigation Log — {{ plan.departure_icao }} → {{ plan.arrival_icao }}</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th class="left">FIX</th>
+        <th class="left">Lat</th>
+        <th class="left">Lon</th>
+        <th>Course</th>
+        <th>Dist (NM)</th>
+        <th>Cum (NM)</th>
+        <th>Alt (ft)</th>
+        <th>WIND</th>
+        <th>TAS (kt)</th>
+        <th>GS (kt)</th>
+        <th>ETE (cum)</th>
+        <th>Fuel Used (kg)</th>
+        <th>Fuel Rem (kg)</th>
+        <th class="left">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for leg in legs %}
+      <tr>
+        <td>{{ leg.sequence }}</td>
+        <td class="left">{{ leg.ident }}</td>
+        <td class="left">{{ '%.4f' % (leg.latitude or 0) }}</td>
+        <td class="left">{{ '%.4f' % (leg.longitude or 0) }}</td>
+        <td>{{ '%05.1f' % (leg.course_deg or 0) }}</td>
+        <td>{{ '%.1f' % (leg.distance_nm or 0) }}</td>
+        <td>{{ '%.1f' % (leg.cumulative_distance_nm or 0) }}</td>
+        <td>{{ leg.altitude_ft or '' }}</td>
+        <td>{{ '%03.0f' % (leg.wind_direction_deg or 0) }}/{{ '%02.0f' % (leg.wind_speed_kts or 0) }}</td>
+        <td>{{ '%.0f' % (leg.true_air_speed_kts or 0) }}</td>
+        <td>{{ '%.0f' % (leg.ground_speed_kts or 0) }}</td>
+        <td>{{ '%02d:%02d' % ((leg.eta_seconds or 0) // 3600, ((leg.eta_seconds or 0) % 3600) // 60) }}</td>
+        <td>{{ '%.0f' % (leg.fuel_used_kg or 0) }}</td>
+        <td>{{ '%.0f' % (leg.fuel_remaining_kg or 0) }}</td>
+        <td class="left">{{ leg.airway_ident or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="footer">
+    OpenDispatch Navigation Log — v{{ template_version }} — Generated {{ format_iso(generated_at) }} UTC.
+  </div>
+</body>
+</html>

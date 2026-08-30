@@ -1,0 +1,71 @@
+[tool.poetry]
+name = "opendispatch-api"
+version = "0.1.0"
+description = "OpenDispatch API - flight planning and dispatch"
+authors = ["OpenDispatch"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+fastapi = "^0.115.5"
+uvicorn = {extras = ["standard"], version = "^0.32.1"}
+pydantic = "^2.10.2"
+pydantic-settings = "^2.6.1"
+sqlalchemy = "^2.0.36"
+alembic = "^1.14.0"
+psycopg = {extras = ["binary"], version = "^3.2.3"}
+geoalchemy2 = "^0.16.0"
+shapely = "^2.0.6"
+redis = "^5.2.0"
+celery = "^5.4.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["argon2"], version = "^1.7.4"}
+argon2-cffi = "^23.1.0"
+python-multipart = "^0.0.20"
+email-validator = "^2.2.0"
+httpx = "^0.28.0"
+jinja2 = "^3.1.4"
+weasyprint = "^63.1"
+structlog = "^24.4.0"
+pyyaml = "^6.0.2"
+numpy = "^2.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^6.0.0"
+ruff = "^0.8.1"
+mypy = "^1.13.0"
+types-redis = "^4.6.0"
+faker = "^33.0.0"
+freezegun = "^1.5.1"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["node_modules", "dist", "build", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "C4", "DTZ", "T20", "RUF"]
+ignore = ["S101", "S104", "S311", "B008", "B904", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "N", "B"]
+"app/scripts/*" = ["S", "T20"]
+"**/migrations/*" = ["E", "F", "I", "N", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+plugins = ["pydantic.mypy"]
+exclude = ["node_modules", "dist", "build", ".venv"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q"
+testpaths = ["tests", "app"]
+pythonpath = ["."]
