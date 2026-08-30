@@ -32,3 +32,4 @@ apps/web/node_modules
 tests/e2e/test-results/
 tests/e2e/playwright-report/
 coverage
+test-results/

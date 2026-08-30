@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "name": "OpenDispatch test navigation fixture (Indian subcontinent subset)",
+    "name": "OpenDispatch test navigation fixture (global subset)",
     "description": "Small, deterministic, open-source-friendly test dataset for development and CI. NOT FOR OPERATIONAL USE. Real coordinates are sourced from publicly available reference information for major airports; procedures and airways are simplified and synthetic.",
-    "cycle": "2401",
-    "scope": "VABB, VOMM, VIDP, VABO, VABP, VABV, VOML, VOPB, airways A466/A791, fixes along the way"
+    "cycle": "2608",
+    "scope": "Global major airports (Europe, North America, Asia, Middle East, Oceania, South America, Africa) plus the Indian subcontinent subset, with airways A466/A791/L301 and procedures at VABB, VIDP, VOMM."
   },
   "airports": [
     {
@@ -141,6 +141,295 @@
       "timezone": "Asia/Kolkata",
       "runways": [
         {"ident": "10", "reciprocal_ident": "28", "length_ft": 10500, "width_ft": 197, "heading_deg": 100, "surface": "ASP", "elevation_ft": 15, "ils_available": true, "ils_category": "I", "lighting": true}
+      ]
+    },
+    {
+      "icao": "EGLL",
+      "iata": "LHR",
+      "name": "London Heathrow Airport",
+      "city": "London",
+      "country": "United Kingdom",
+      "region": "England",
+      "latitude": 51.4775,
+      "longitude": -0.4614,
+      "elevation_ft": 83,
+      "magnetic_variation": -0.5,
+      "timezone": "Europe/London",
+      "runways": [
+        {"ident": "09L", "reciprocal_ident": "27R", "length_ft": 12808, "width_ft": 164, "heading_deg": 90, "surface": "ASP", "elevation_ft": 78, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09R", "reciprocal_ident": "27L", "length_ft": 12008, "width_ft": 164, "heading_deg": 90, "surface": "ASP", "elevation_ft": 78, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "EHAM",
+      "iata": "AMS",
+      "name": "Amsterdam Airport Schiphol",
+      "city": "Amsterdam",
+      "country": "Netherlands",
+      "region": "North Holland",
+      "latitude": 52.3105,
+      "longitude": 4.7683,
+      "elevation_ft": -11,
+      "magnetic_variation": 0.7,
+      "timezone": "Europe/Amsterdam",
+      "runways": [
+        {"ident": "18R", "reciprocal_ident": "36L", "length_ft": 12467, "width_ft": 197, "heading_deg": 183, "surface": "ASP", "elevation_ft": -11, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09", "reciprocal_ident": "27", "length_ft": 11329, "width_ft": 197, "heading_deg": 87, "surface": "ASP", "elevation_ft": -11, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "LFPG",
+      "iata": "CDG",
+      "name": "Paris Charles de Gaulle Airport",
+      "city": "Paris",
+      "country": "France",
+      "region": "Ile-de-France",
+      "latitude": 49.0097,
+      "longitude": 2.5479,
+      "elevation_ft": 392,
+      "magnetic_variation": 0.5,
+      "timezone": "Europe/Paris",
+      "runways": [
+        {"ident": "08L", "reciprocal_ident": "26R", "length_ft": 13780, "width_ft": 197, "heading_deg": 85, "surface": "ASP", "elevation_ft": 392, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09R", "reciprocal_ident": "27L", "length_ft": 8858, "width_ft": 197, "heading_deg": 94, "surface": "ASP", "elevation_ft": 388, "ils_available": true, "ils_category": "II", "lighting": true}
+      ]
+    },
+    {
+      "icao": "EDDF",
+      "iata": "FRA",
+      "name": "Frankfurt am Main Airport",
+      "city": "Frankfurt",
+      "country": "Germany",
+      "region": "Hesse",
+      "latitude": 50.0379,
+      "longitude": 8.5622,
+      "elevation_ft": 364,
+      "magnetic_variation": 1.5,
+      "timezone": "Europe/Berlin",
+      "runways": [
+        {"ident": "07C", "reciprocal_ident": "25C", "length_ft": 13123, "width_ft": 197, "heading_deg": 70, "surface": "ASP", "elevation_ft": 362, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "18", "reciprocal_ident": "36", "length_ft": 13123, "width_ft": 197, "heading_deg": 183, "surface": "ASP", "elevation_ft": 355, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "LIRF",
+      "iata": "FCO",
+      "name": "Rome Fiumicino Leonardo da Vinci Airport",
+      "city": "Rome",
+      "country": "Italy",
+      "region": "Lazio",
+      "latitude": 41.8003,
+      "longitude": 12.2389,
+      "elevation_ft": 13,
+      "magnetic_variation": 2.1,
+      "timezone": "Europe/Rome",
+      "runways": [
+        {"ident": "16R", "reciprocal_ident": "34L", "length_ft": 12795, "width_ft": 197, "heading_deg": 160, "surface": "ASP", "elevation_ft": 13, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "07", "reciprocal_ident": "25", "length_ft": 10886, "width_ft": 197, "heading_deg": 70, "surface": "ASP", "elevation_ft": 11, "ils_available": true, "ils_category": "II", "lighting": true}
+      ]
+    },
+    {
+      "icao": "KJFK",
+      "iata": "JFK",
+      "name": "John F. Kennedy International Airport",
+      "city": "New York",
+      "country": "United States",
+      "region": "New York",
+      "latitude": 40.6398,
+      "longitude": -73.7789,
+      "elevation_ft": 13,
+      "magnetic_variation": -12.7,
+      "timezone": "America/New_York",
+      "runways": [
+        {"ident": "04L", "reciprocal_ident": "22R", "length_ft": 12079, "width_ft": 200, "heading_deg": 31, "surface": "ASP", "elevation_ft": 12, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "13R", "reciprocal_ident": "31L", "length_ft": 14511, "width_ft": 200, "heading_deg": 121, "surface": "ASP", "elevation_ft": 13, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "KATL",
+      "iata": "ATL",
+      "name": "Hartsfield-Jackson Atlanta International Airport",
+      "city": "Atlanta",
+      "country": "United States",
+      "region": "Georgia",
+      "latitude": 33.6407,
+      "longitude": -84.4277,
+      "elevation_ft": 1026,
+      "magnetic_variation": -4.0,
+      "timezone": "America/New_York",
+      "runways": [
+        {"ident": "09L", "reciprocal_ident": "27R", "length_ft": 12390, "width_ft": 150, "heading_deg": 90, "surface": "CON", "elevation_ft": 1018, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "08R", "reciprocal_ident": "26L", "length_ft": 9999, "width_ft": 150, "heading_deg": 80, "surface": "CON", "elevation_ft": 1026, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "KSFO",
+      "iata": "SFO",
+      "name": "San Francisco International Airport",
+      "city": "San Francisco",
+      "country": "United States",
+      "region": "California",
+      "latitude": 37.6213,
+      "longitude": -122.3790,
+      "elevation_ft": 13,
+      "magnetic_variation": 14.5,
+      "timezone": "America/Los_Angeles",
+      "runways": [
+        {"ident": "28L", "reciprocal_ident": "10R", "length_ft": 11381, "width_ft": 200, "heading_deg": 284, "surface": "ASP", "elevation_ft": 11, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "28R", "reciprocal_ident": "10L", "length_ft": 11870, "width_ft": 200, "heading_deg": 284, "surface": "ASP", "elevation_ft": 13, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "KORD",
+      "iata": "ORD",
+      "name": "Chicago O'Hare International Airport",
+      "city": "Chicago",
+      "country": "United States",
+      "region": "Illinois",
+      "latitude": 41.9742,
+      "longitude": -87.9073,
+      "elevation_ft": 672,
+      "magnetic_variation": -3.4,
+      "timezone": "America/Chicago",
+      "runways": [
+        {"ident": "10C", "reciprocal_ident": "28C", "length_ft": 10801, "width_ft": 200, "heading_deg": 90, "surface": "CON", "elevation_ft": 672, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09R", "reciprocal_ident": "27L", "length_ft": 7978, "width_ft": 150, "heading_deg": 90, "surface": "CON", "elevation_ft": 651, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "CYYZ",
+      "iata": "YYZ",
+      "name": "Toronto Pearson International Airport",
+      "city": "Toronto",
+      "country": "Canada",
+      "region": "Ontario",
+      "latitude": 43.6777,
+      "longitude": -79.6248,
+      "elevation_ft": 569,
+      "magnetic_variation": -9.7,
+      "timezone": "America/Toronto",
+      "runways": [
+        {"ident": "05", "reciprocal_ident": "23", "length_ft": 11120, "width_ft": 200, "heading_deg": 46, "surface": "ASP", "elevation_ft": 569, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "15L", "reciprocal_ident": "33R", "length_ft": 9000, "width_ft": 200, "heading_deg": 146, "surface": "ASP", "elevation_ft": 547, "ils_available": true, "ils_category": "II", "lighting": true}
+      ]
+    },
+    {
+      "icao": "RJTT",
+      "iata": "HND",
+      "name": "Tokyo Haneda Airport",
+      "city": "Tokyo",
+      "country": "Japan",
+      "region": "Kanto",
+      "latitude": 35.5494,
+      "longitude": 139.7798,
+      "elevation_ft": 35,
+      "magnetic_variation": -7.2,
+      "timezone": "Asia/Tokyo",
+      "runways": [
+        {"ident": "16R", "reciprocal_ident": "34L", "length_ft": 9842, "width_ft": 197, "heading_deg": 160, "surface": "ASP", "elevation_ft": 21, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "04", "reciprocal_ident": "22", "length_ft": 8202, "width_ft": 197, "heading_deg": 42, "surface": "ASP", "elevation_ft": 35, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "VHHH",
+      "iata": "HKG",
+      "name": "Hong Kong International Airport",
+      "city": "Hong Kong",
+      "country": "Hong Kong (SAR)",
+      "region": "Chek Lap Kok",
+      "latitude": 22.3080,
+      "longitude": 113.9185,
+      "elevation_ft": 28,
+      "magnetic_variation": -2.6,
+      "timezone": "Asia/Hong_Kong",
+      "runways": [
+        {"ident": "07R", "reciprocal_ident": "25L", "length_ft": 12467, "width_ft": 197, "heading_deg": 70, "surface": "ASP", "elevation_ft": 22, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "07C", "reciprocal_ident": "25C", "length_ft": 12467, "width_ft": 197, "heading_deg": 70, "surface": "ASP", "elevation_ft": 28, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "WSSS",
+      "iata": "SIN",
+      "name": "Singapore Changi Airport",
+      "city": "Singapore",
+      "country": "Singapore",
+      "region": "Changi",
+      "latitude": 1.3644,
+      "longitude": 103.9915,
+      "elevation_ft": 22,
+      "magnetic_variation": 0.3,
+      "timezone": "Asia/Singapore",
+      "runways": [
+        {"ident": "02L", "reciprocal_ident": "20R", "length_ft": 13123, "width_ft": 197, "heading_deg": 20, "surface": "ASP", "elevation_ft": 22, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "02C", "reciprocal_ident": "20C", "length_ft": 13123, "width_ft": 197, "heading_deg": 20, "surface": "ASP", "elevation_ft": 22, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "OMDB",
+      "iata": "DXB",
+      "name": "Dubai International Airport",
+      "city": "Dubai",
+      "country": "United Arab Emirates",
+      "region": "Dubai",
+      "latitude": 25.2532,
+      "longitude": 55.3657,
+      "elevation_ft": 62,
+      "magnetic_variation": 1.8,
+      "timezone": "Asia/Dubai",
+      "runways": [
+        {"ident": "12L", "reciprocal_ident": "30R", "length_ft": 13124, "width_ft": 197, "heading_deg": 121, "surface": "ASP", "elevation_ft": 62, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "12R", "reciprocal_ident": "30L", "length_ft": 14600, "width_ft": 197, "heading_deg": 121, "surface": "ASP", "elevation_ft": 58, "ils_available": true, "ils_category": "III", "lighting": true}
+      ]
+    },
+    {
+      "icao": "YSSY",
+      "iata": "SYD",
+      "name": "Sydney Kingsford Smith Airport",
+      "city": "Sydney",
+      "country": "Australia",
+      "region": "New South Wales",
+      "latitude": -33.9399,
+      "longitude": 151.1753,
+      "elevation_ft": 21,
+      "magnetic_variation": 12.7,
+      "timezone": "Australia/Sydney",
+      "runways": [
+        {"ident": "16R", "reciprocal_ident": "34L", "length_ft": 12999, "width_ft": 197, "heading_deg": 160, "surface": "ASP", "elevation_ft": 14, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "07", "reciprocal_ident": "25", "length_ft": 8299, "width_ft": 197, "heading_deg": 67, "surface": "ASP", "elevation_ft": 21, "ils_available": true, "ils_category": "II", "lighting": true}
+      ]
+    },
+    {
+      "icao": "SBGR",
+      "iata": "GRU",
+      "name": "Sao Paulo Guarulhos International Airport",
+      "city": "Sao Paulo",
+      "country": "Brazil",
+      "region": "Sao Paulo",
+      "latitude": -23.4356,
+      "longitude": -46.4731,
+      "elevation_ft": 2459,
+      "magnetic_variation": -19.0,
+      "timezone": "America/Sao_Paulo",
+      "runways": [
+        {"ident": "10L", "reciprocal_ident": "28R", "length_ft": 12139, "width_ft": 197, "heading_deg": 100, "surface": "ASP", "elevation_ft": 2459, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "09R", "reciprocal_ident": "27L", "length_ft": 9842, "width_ft": 197, "heading_deg": 90, "surface": "ASP", "elevation_ft": 2434, "ils_available": true, "ils_category": "II", "lighting": true}
+      ]
+    },
+    {
+      "icao": "FAOR",
+      "iata": "JNB",
+      "name": "O.R. Tambo International Airport",
+      "city": "Johannesburg",
+      "country": "South Africa",
+      "region": "Gauteng",
+      "latitude": -26.1392,
+      "longitude": 28.2460,
+      "elevation_ft": 5558,
+      "magnetic_variation": -18.0,
+      "timezone": "Africa/Johannesburg",
+      "runways": [
+        {"ident": "03R", "reciprocal_ident": "21L", "length_ft": 14495, "width_ft": 197, "heading_deg": 20, "surface": "ASP", "elevation_ft": 5558, "ils_available": true, "ils_category": "III", "lighting": true},
+        {"ident": "03L", "reciprocal_ident": "21R", "length_ft": 10800, "width_ft": 197, "heading_deg": 20, "surface": "ASP", "elevation_ft": 5525, "ils_available": true, "ils_category": "III", "lighting": true}
       ]
     }
   ],

@@ -42,6 +42,7 @@ export function RouteEditor({ value, onChange }: { value: string; onChange: (v: 
   return (
     <div className="space-y-2">
       <textarea
+        id="od-route-text"
         className="input font-mono text-sm"
         rows={2}
         value={value}

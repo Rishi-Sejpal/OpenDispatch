@@ -19,15 +19,15 @@ import { LiveSummary } from '../components/LiveSummary';
 import { RouteEditor } from '../components/RouteEditor';
 
 const schema = z.object({
-  departure_icao: z.string().min(3),
-  arrival_icao: z.string().min(3),
-  alternate_icaos: z.array(z.string()).default([]),
+  departure_icao: z.string().min(3, 'Departure ICAO is required'),
+  arrival_icao: z.string().min(3, 'Destination ICAO is required'),
+  alternate_icaos: z.array(z.string()),
   aircraft_registration_id: z.string().nullable().optional(),
-  passengers: z.coerce.number().int().min(0).default(0),
-  cargo_kg: z.coerce.number().min(0).default(0),
-  cruise_altitude_ft: z.coerce.number().int().min(5000).max(50000).default(35000),
-  cost_index: z.coerce.number().int().min(0).default(30),
-  route_text: z.string().default(''),
+  passengers: z.coerce.number().int().min(0),
+  cargo_kg: z.coerce.number().min(0),
+  cruise_altitude_ft: z.coerce.number().int().min(5000).max(50000),
+  cost_index: z.coerce.number().int().min(0),
+  route_text: z.string().min(1, 'Route is required'),
   departure_runway_ident: z.string().nullable().optional(),
   arrival_runway_ident: z.string().nullable().optional(),
   sid_id: z.string().nullable().optional(),
@@ -40,10 +40,10 @@ type FormData = z.input<typeof schema>;
 
 export default function NewFlightPlan() {
   const nav = useNavigate();
-  const [depQuery, setDepQuery] = useState('VABB');
-  const [arrQuery, setArrQuery] = useState('VIDP');
-  const [depIcao, setDepIcao] = useState<string | null>('VABB');
-  const [arrIcao, setArrIcao] = useState<string | null>('VIDP');
+  const [depQuery, setDepQuery] = useState('');
+  const [arrQuery, setArrQuery] = useState('');
+  const [depIcao, setDepIcao] = useState<string | null>(null);
+  const [arrIcao, setArrIcao] = useState<string | null>(null);
   const [planId, setPlanId] = useState<string | null>(null);
 
   const depAirports = useAirports(depQuery);
@@ -63,13 +63,15 @@ export default function NewFlightPlan() {
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      departure_icao: 'VABB',
-      arrival_icao: 'VIDP',
-      cruise_altitude_ft: 35000,
-      cost_index: 30,
-      passengers: 150,
-      cargo_kg: 1200,
-      route_text: 'VABB DCT BOM A466 GADIN A466 DEL DCT VIDP',
+      departure_icao: '',
+      arrival_icao: '',
+      alternate_icaos: [],
+      aircraft_registration_id: null,
+      passengers: 0,
+      cargo_kg: 0,
+      cruise_altitude_ft: 0,
+      cost_index: 0,
+      route_text: '',
     },
   });
 

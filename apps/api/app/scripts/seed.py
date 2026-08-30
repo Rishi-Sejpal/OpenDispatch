@@ -7,10 +7,10 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from app.core.config import get_settings
 from app.core.packages_path import ensure_packages_on_path
@@ -40,6 +40,7 @@ from app.models import (  # noqa: E402
     UserRole,
 )
 from app.services import audit  # noqa: E402
+from app.services.airac import current_airac_cycle  # noqa: E402
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -47,24 +48,53 @@ TEST_NAV_PATH = REPO_ROOT / "data" / "test-navigation"
 
 
 def upsert_airac_cycle(db) -> AiracCycle:
-    cycle_id_str = "2401"
+    """Ensure the current real-world AIRAC cycle exists and is the active one.
+
+    The active cycle is resolved deterministically from today's date so the
+    system always uses the currently effective AIRAC schedule. Older cycles
+    present in the database are deactivated but their navigation data is
+    retained for historical flight plans.
+    """
+    info = current_airac_cycle()
+    cycle_id_str = info.cycle
+
+    # Deactivate any other active cycle so this one is the unique active.
+    db.execute(update(AiracCycle).where(AiracCycle.is_active.is_(True)).values(is_active=False))
+
     existing = db.scalar(select(AiracCycle).where(AiracCycle.cycle == cycle_id_str))
     if existing is not None:
-        # make sure it is active
-        if not existing.is_active:
-            existing.is_active = True
+        existing.effective_from = datetime.combine(
+            info.effective_from, datetime.min.time(), tzinfo=timezone.utc
+        )
+        existing.effective_to = datetime.combine(
+            info.effective_to, datetime.min.time(), tzinfo=timezone.utc
+        )
+        existing.is_active = True
+        existing.import_status = AiracImportStatus.COMPLETE
+        existing.notes = (
+            f"Current AIRAC cycle, effective {info.effective_from.isoformat()} "
+            f"through {info.effective_to.isoformat()} (computed deterministically)."
+        )
+        db.flush()
         return existing
-    today = datetime.now(tz=timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
     cycle = AiracCycle(
         cycle=cycle_id_str,
-        effective_from=today - timedelta(days=14),
-        effective_to=today + timedelta(days=14),
+        effective_from=datetime.combine(
+            info.effective_from, datetime.min.time(), tzinfo=timezone.utc
+        ),
+        effective_to=datetime.combine(
+            info.effective_to, datetime.min.time(), tzinfo=timezone.utc
+        ),
         source="test-fixture",
         version="1",
         import_status=AiracImportStatus.COMPLETE,
         checksum="local-test-data",
         is_active=True,
-        notes="Synthetic AIRAC cycle shipped with the OpenDispatch test dataset. Not for operational use.",
+        notes=(
+            f"Current AIRAC cycle, effective {info.effective_from.isoformat()} "
+            f"through {info.effective_to.isoformat()} (computed deterministically)."
+        ),
     )
     db.add(cycle)
     db.flush()

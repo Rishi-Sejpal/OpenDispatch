@@ -35,6 +35,9 @@ test('full flight planning flow: register, create, calculate, dispatch, generate
   // Set cruise altitude
   await page.locator('#od-cruise-alt').fill('35000');
 
+  // Set the route
+  await page.locator('#od-route-text').fill('VABB DCT BOM A466 GADIN A466 DEL DCT VIDP');
+
   // 4. Create the draft
   await page.getByRole('button', { name: /create draft/i }).click();
   await expect(page.getByText(/flight plan created/i)).toBeVisible({ timeout: 10000 });
