@@ -1,4 +1,6 @@
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosError, type AxiosInstance } from 'axios';
+
+import { supabase } from './supabase';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
 
@@ -7,20 +9,28 @@ export const api: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('od_access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async (config) => {
+  if (supabase) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
   }
   return config;
 });
 
 api.interceptors.response.use(
   (r) => r,
-  (err: AxiosError<{ error?: { code: string; message: string } }>) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('od_access_token');
-      localStorage.removeItem('od_refresh_token');
+  async (err: AxiosError<{ error?: { code: string; message: string } }>) => {
+    if (err.response?.status === 401 && supabase) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        await supabase.auth.signOut();
+      }
       if (!window.location.pathname.startsWith('/login')) {
         window.location.href = '/login';
       }
@@ -46,16 +56,10 @@ export function extractError(e: unknown): ApiError {
   };
 }
 
-export function setTokens(access: string, refresh: string) {
-  localStorage.setItem('od_access_token', access);
-  localStorage.setItem('od_refresh_token', refresh);
-}
-
-export function clearTokens() {
-  localStorage.removeItem('od_access_token');
-  localStorage.removeItem('od_refresh_token');
-}
-
-export function getAccessToken(): string | null {
-  return localStorage.getItem('od_access_token');
+export async function getAccessToken(): Promise<string | null> {
+  if (!supabase) return null;
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
 }

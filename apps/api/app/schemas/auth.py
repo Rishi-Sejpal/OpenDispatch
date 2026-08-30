@@ -8,23 +8,14 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128)
-    full_name: str = Field(..., min_length=1, max_length=200)
-    organization_name: str | None = Field(default=None, max_length=200)
+class BootstrapOrganizationRequest(BaseModel):
+    """Create the caller's first organization and add them as owner.
 
+    Called once by the frontend after the user signs up via Supabase Auth,
+    so the rest of the API has an organization to attach flight plans to.
+    """
 
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str = Field(..., min_length=1, max_length=128)
-
-
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-    expires_in: int
+    organization_name: str = Field(..., min_length=1, max_length=200)
 
 
 class UserResponse(BaseModel):

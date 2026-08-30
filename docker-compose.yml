@@ -1,8 +1,13 @@
 name: opendispatch
 
+# The default stack points the application at a local postgis database so
+# `make up` and `make test` work out of the box. To run against a real
+# Supabase project instead, set DATABASE_URL (and the SUPABASE_* variables)
+# in .env — they override the defaults below. See docs/SUPABASE.md.
 services:
   db:
     image: postgis/postgis:15-3.4
+    profiles: ["default", "local-db"]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-opendispatch}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opendispatch}
@@ -36,11 +41,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        required: false
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-opendispatch}:${POSTGRES_PASSWORD:-opendispatch}@db:5432/${POSTGRES_DB:-opendispatch}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://opendispatch:opendispatch@db:5432/opendispatch}
       REDIS_URL: redis://redis:6379/0
+      SUPABASE_URL: ${SUPABASE_URL:-https://[YOUR-PROJECT-REF].supabase.co}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-[YOUR-SUPABASE-ANON-KEY]}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-[YOUR-SUPABASE-SERVICE-ROLE-KEY]}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-[YOUR-SUPABASE-JWT-SECRET]}
+      SEED_USE_SUPABASE_AUTH: ${SEED_USE_SUPABASE_AUTH:-false}
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please-use-a-long-random-string}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-3600}
@@ -78,18 +89,20 @@ services:
       context: .
       dockerfile: docker/api.Dockerfile
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-opendispatch}:${POSTGRES_PASSWORD:-opendispatch}@db:5432/${POSTGRES_DB:-opendispatch}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://opendispatch:opendispatch@db:5432/opendispatch}
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please-use-a-long-random-string}
+      SUPABASE_URL: ${SUPABASE_URL:-https://[YOUR-PROJECT-REF].supabase.co}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-[YOUR-SUPABASE-ANON-KEY]}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-[YOUR-SUPABASE-SERVICE-ROLE-KEY]}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-[YOUR-SUPABASE-JWT-SECRET]}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       LOG_JSON: ${LOG_JSON:-true}
       STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
       STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-/var/opendispatch/storage}
+      APP_ENV: ${APP_ENV:-development}
     command: ["celery", "-A", "app.worker.celery_app", "worker", "-l", "INFO", "--concurrency=2"]
     volumes:
       - storage:/var/opendispatch/storage
@@ -102,6 +115,8 @@ services:
       - api
     environment:
       VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000/api/v1}
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-${SUPABASE_URL:-https://[YOUR-PROJECT-REF].supabase.co}}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-${SUPABASE_ANON_KEY:-[YOUR-SUPABASE-ANON-KEY]}}
     ports:
       - "5173:5173"
     volumes:
@@ -112,3 +127,4 @@ volumes:
   pgdata:
   redisdata:
   storage:
+

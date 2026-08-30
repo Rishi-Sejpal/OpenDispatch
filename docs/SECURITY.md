@@ -6,22 +6,31 @@ terminates TLS.
 
 ## Authentication
 
-- **Argon2id** for password hashing (`argon2-cffi` with
-  `time_cost=3, memory_cost=64MB, parallelism=4`).
-- **JWT** access tokens (HS256, 1 hour TTL) and refresh tokens (30 day TTL).
-- Refresh tokens are tracked in `user_sessions` and can be revoked
-  individually or in bulk via `POST /auth/logout`.
-- All non-public endpoints require a valid access token.
+Authentication is delegated to [Supabase Auth](https://supabase.com/docs/guides/auth).
 
-Replace `JWT_SECRET` with a long, random value for any non-development
-deployment. Rotating the secret invalidates all existing tokens.
+- The frontend uses `supabase-js` to sign up, sign in, and refresh tokens.
+- The backend verifies Supabase-issued HS256 access tokens with
+  `SUPABASE_JWT_SECRET` on every protected endpoint.
+- No passwords are ever stored in the OpenDispatch database. Supabase
+  handles credential storage (argon2id by default) and refresh tokens.
+- The first time a Supabase user calls the API the backend auto-provisions
+  a `public.users` row by reading `email`, `user_metadata.full_name`, and
+  `app_metadata.is_superuser` from the JWT.
+- `POST /auth/logout` is recorded in the audit log; the actual sign-out
+  happens client-side via `supabase.auth.signOut()`.
+
+The `JWT_SECRET` legacy variable is retained for backwards compatibility
+with any locally-issued tokens but is no longer used by the application.
+Supabase's own `SUPABASE_JWT_SECRET` is the secret you must protect and
+rotate. Rotating it invalidates every active session.
 
 ## Authorization
 
 - Organization-scoped role checks: `OWNER`, `ADMIN`, `DISPATCHER`, `PILOT`,
   `VIEWER`.
 - Plan visibility is scoped to the caller's organizations.
-- `is_superuser` bypasses role checks; only the seed user is a superuser.
+- `is_superuser` (read from the JWT's `app_metadata.is_superuser`) bypasses
+  role checks. The seed user is the only superuser.
 - Admin endpoints (e.g. AIRAC import) require `ADMIN` or higher.
 
 The role hierarchy is:
@@ -71,6 +80,9 @@ directly for now.
 ## Secrets
 
 - Never commit `.env` to the repository (`.gitignore` excludes it).
+- The `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_JWT_SECRET` are
+  server-only secrets. The `SUPABASE_ANON_KEY` is safe to expose to the
+  browser (it is embedded in the web bundle).
 - The seed user's password is **only** for local development. Change
   immediately for any non-development deployment.
 - The compose file does not pass through Docker secrets; for production,

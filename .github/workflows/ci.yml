@@ -58,8 +58,9 @@ jobs:
             sqlalchemy==2.0.36 alembic==1.14.0 'psycopg[binary]==3.2.3' \
             geoalchemy2==0.16.0 shapely==2.0.6 \
             redis==5.2.0 celery==5.4.0 \
-            'python-jose[cryptography]==3.3.0' 'passlib[argon2]==1.7.4' \
-            argon2-cffi==23.1.0 python-multipart==0.0.20 \
+            'python-jose[cryptography]==3.3.0' \
+            python-multipart==0.0.20 \
+            'supabase>=2.6,<3' \
             email-validator==2.2.0 httpx==0.28.0 jinja2==3.1.4 \
             weasyprint==63.1 structlog==24.4.0 pyyaml==6.0.2 numpy==2.2.0 \
             pytest==8.3.4 pytest-asyncio==0.24.0 pytest-cov==6.0.0 \
@@ -71,11 +72,20 @@ jobs:
         working-directory: apps/api
         env:
           PYTHONPATH: .
+          SUPABASE_URL: https://test.supabase.co
+          SUPABASE_ANON_KEY: test-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+          SUPABASE_JWT_SECRET: test-supabase-jwt-secret-do-not-use-in-production
         run: mypy app
       - name: Migrate
         run: |
           alembic -c apps/api/alembic.ini upgrade head
       - name: Seed
+        env:
+          SUPABASE_URL: https://test.supabase.co
+          SUPABASE_ANON_KEY: test-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+          SUPABASE_JWT_SECRET: test-supabase-jwt-secret-do-not-use-in-production
         run: |
           PYTHONPATH=apps/api:services:packages/aviation-units:packages/aviation-geometry \
             python -m app.scripts.seed
@@ -83,6 +93,10 @@ jobs:
         working-directory: apps/api
         env:
           PYTHONPATH: .
+          SUPABASE_URL: https://test.supabase.co
+          SUPABASE_ANON_KEY: test-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+          SUPABASE_JWT_SECRET: test-supabase-jwt-secret-do-not-use-in-production
         run: pytest tests/
 
   frontend:

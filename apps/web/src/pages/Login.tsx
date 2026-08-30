@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { login } from '../lib/auth';
-import { extractError } from '../lib/api';
 
 const schema = z.object({
   email: z.string().email(),
@@ -29,7 +28,7 @@ export default function Login() {
       toast.success('Signed in');
       nav('/');
     } catch (e) {
-      toast.error(extractError(e).message);
+      toast.error((e as Error).message || 'Sign in failed');
     } finally {
       setLoading(false);
     }

@@ -14,10 +14,10 @@ from sqlalchemy import select, update
 
 from app.core.config import get_settings
 from app.core.packages_path import ensure_packages_on_path
+from app.core.supabase import get_supabase_admin
 
 ensure_packages_on_path()
 
-from app.core.security import hash_password  # noqa: E402
 from app.db.session import session_scope  # noqa: E402
 from app.models import (  # noqa: E402
     AircraftRegistration,
@@ -102,14 +102,73 @@ def upsert_airac_cycle(db) -> AiracCycle:
 
 
 def upsert_user(db) -> User:
+    """Ensure the default superuser exists.
+
+    In production (SEED_USE_SUPABASE_AUTH=true) the user is created and managed
+    in Supabase Auth and mirrored into the local ``users`` table. The
+    ``app_metadata.is_superuser`` flag is the source of truth that
+    ``get_current_user`` reads back when provisioning the local row.
+
+    In CI and local dev without Supabase, a local stub row is created so
+    downstream code that references the seed user (e.g. the default
+    organization) keeps working.
+    """
     settings = get_settings()
-    user = db.scalar(select(User).where(User.email == settings.seed_user_email))
-    if user is not None:
+    email = settings.seed_user_email
+
+    if settings.seed_use_supabase_auth and settings.supabase_configured:
+        admin = get_supabase_admin()
+        listed = admin.auth.admin.list_users(page=1, per_page=200)
+        auth_user = next(
+            (u for u in listed if (u.email or "").lower() == email.lower()),
+            None,
+        )
+        if auth_user is None:
+            created = admin.auth.admin.create_user(
+                {
+                    "email": email,
+                    "password": settings.seed_user_password,
+                    "email_confirm": True,
+                    "user_metadata": {"full_name": settings.seed_user_name},
+                    "app_metadata": {"is_superuser": True, "provider": "openai-seed"},
+                }
+            )
+            auth_user = created.user
+        if not (auth_user.app_metadata or {}).get("is_superuser"):
+            admin.auth.admin.update_user_by_id(
+                auth_user.id,
+                {"app_metadata": {"is_superuser": True, "provider": "openai-seed"}},
+            )
+        user = db.get(User, auth_user.id)
+        if user is None:
+            user = User(
+                id=auth_user.id,
+                email=email,
+                full_name=settings.seed_user_name,
+                is_superuser=True,
+                is_email_verified=True,
+            )
+            db.add(user)
+            db.flush()
         return user
+
+    # Local stub (CI / dev without Supabase). Upsert by email so the seed
+    # works whether or not a row from a previous (password-based) run
+    # already exists in the database.
+    existing = db.scalar(select(User).where(User.email == email))
+    if existing is not None:
+        existing.is_superuser = True
+        existing.is_email_verified = True
+        if not existing.full_name:
+            existing.full_name = settings.seed_user_name
+        return existing
+    import uuid as _uuid
+
+    stable_id = _uuid.uuid5(_uuid.NAMESPACE_DNS, f"opendispatch-seed:{email}")
     user = User(
-        email=settings.seed_user_email,
+        id=stable_id,
+        email=email,
         full_name=settings.seed_user_name,
-        password_hash=hash_password(settings.seed_user_password),
         is_superuser=True,
         is_email_verified=True,
     )

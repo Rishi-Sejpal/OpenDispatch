@@ -13,7 +13,6 @@ import pytest
 from sqlalchemy import delete, select
 
 from app.core.config import get_settings
-from app.core.security import hash_password
 from app.db.session import session_scope
 from app.models import (
     AircraftRegistration,
@@ -72,9 +71,9 @@ def fresh_org(db_session, fresh_user):
 def fresh_user(db_session):
     email = f"test-{uuid.uuid4().hex[:6]}@example.com"
     user = User(
+        id=uuid.uuid4(),
         email=email,
         full_name="Test User",
-        password_hash=hash_password("test1234!"),
     )
     db_session.add(user)
     db_session.flush()

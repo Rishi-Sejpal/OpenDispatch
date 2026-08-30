@@ -28,11 +28,23 @@ export default function Register() {
     setLoading(true);
     try {
       await registerUser(data.email, data.password, data.full_name, data.organization_name);
-      await login(data.email, data.password);
       toast.success('Account created');
       nav('/');
     } catch (e) {
-      toast.error(extractError(e).message);
+      // If the account already exists in Supabase, fall back to sign in.
+      const code = (e as { code?: string }).code;
+      if (code === 'user_already_exists' || /already/i.test((e as Error).message ?? '')) {
+        try {
+          await login(data.email, data.password);
+          toast.success('Signed in');
+          nav('/');
+          return;
+        } catch (loginErr) {
+          toast.error(extractError(loginErr).message);
+        }
+      } else {
+        toast.error((e as Error).message || 'Sign up failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -49,27 +61,41 @@ export default function Register() {
           <div className="text-sm text-slate-400">Start dispatching flight plans</div>
         </div>
         <div>
-          <label className="label">Email</label>
-          <input className="input" type="email" {...register('email')} />
+          <label className="label" htmlFor="register-email">
+            Email
+          </label>
+          <input id="register-email" className="input" type="email" {...register('email')} />
           {errors.email && <p className="text-xs text-rose-400 mt-1">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="label">Full name</label>
-          <input className="input" {...register('full_name')} />
+          <label className="label" htmlFor="register-name">
+            Full name
+          </label>
+          <input id="register-name" className="input" {...register('full_name')} />
           {errors.full_name && (
             <p className="text-xs text-rose-400 mt-1">{errors.full_name.message}</p>
           )}
         </div>
         <div>
-          <label className="label">Password</label>
-          <input className="input" type="password" {...register('password')} />
+          <label className="label" htmlFor="register-password">
+            Password
+          </label>
+          <input
+            id="register-password"
+            className="input"
+            type="password"
+            {...register('password')}
+          />
           {errors.password && (
             <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
           )}
         </div>
         <div>
-          <label className="label">Organization (optional)</label>
+          <label className="label" htmlFor="register-org">
+            Organization (optional)
+          </label>
           <input
+            id="register-org"
             className="input"
             placeholder="e.g. Acme Airlines"
             {...register('organization_name')}

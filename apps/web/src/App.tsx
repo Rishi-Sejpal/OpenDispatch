@@ -1,8 +1,9 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { api, getAccessToken } from './lib/api';
+import { api } from './lib/api';
 import { useTheme } from './lib/theme';
+import { useSupabaseSession } from './lib/useSupabaseSession';
 import { cn } from './lib/cn';
 
 const Login = lazy(() => import('./pages/Login'));
@@ -47,10 +48,11 @@ function NavItem({ to, label }: { to: string; label: string }) {
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const [, toggleTheme] = useTheme();
+  const { hasToken } = useSupabaseSession();
   const me = useQuery({
     queryKey: ['me'],
     queryFn: async () => (await api.get('/auth/me')).data,
-    enabled: !!getAccessToken(),
+    enabled: hasToken,
     retry: false,
   });
 
@@ -105,7 +107,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 function ProtectedShell({ children }: { children: React.ReactNode }) {
-  if (!getAccessToken()) return <Navigate to="/login" replace />;
+  const { hasToken, loading } = useSupabaseSession();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg-base text-slate-400">
+        Loading…
+      </div>
+    );
+  }
+  if (!hasToken) return <Navigate to="/login" replace />;
   return <AppShell>{children}</AppShell>;
 }
 

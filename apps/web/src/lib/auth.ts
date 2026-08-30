@@ -1,37 +1,56 @@
-import { api, setTokens, clearTokens } from './api';
+import { api } from './api';
+import { supabase } from './supabase';
 import type { User } from './types';
 
+export type BootstrapOrganization = (organizationName: string) => Promise<User>;
+
 export async function login(email: string, password: string) {
-  const r = await api.post<{ access_token: string; refresh_token: string }>('/auth/login', {
-    email,
-    password,
-  });
-  setTokens(r.data.access_token, r.data.refresh_token);
-  return r.data;
+  if (!supabase) {
+    throw Object.assign(new Error('Supabase is not configured.'), { code: 'SUPABASE_MISSING' });
+  }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    throw Object.assign(new Error(error.message), { code: error.name });
+  }
 }
 
 export async function register(
   email: string,
   password: string,
   fullName: string,
-  orgName?: string,
+  organizationName?: string,
 ) {
-  const r = await api.post<User>('/auth/register', {
+  if (!supabase) {
+    throw Object.assign(new Error('Supabase is not configured.'), { code: 'SUPABASE_MISSING' });
+  }
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    full_name: fullName,
-    organization_name: orgName,
+    options: {
+      data: { full_name: fullName, organization_name: organizationName ?? null },
+    },
   });
-  return r.data;
+  if (error) {
+    throw Object.assign(new Error(error.message), { code: error.name });
+  }
+  if (organizationName && data.session) {
+    await api.post('/auth/bootstrap', { organization_name: organizationName });
+  }
 }
 
 export async function logout() {
+  if (supabase) {
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
+  }
   try {
     await api.post('/auth/logout');
   } catch {
     // ignore
   }
-  clearTokens();
 }
 
 export async function me() {

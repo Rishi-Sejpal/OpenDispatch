@@ -64,7 +64,7 @@ opendispatch/
 | Concern | Where |
 |---|---|
 | HTTP API | `apps/api/app/main.py`, `apps/api/app/api/v1/routes/*` |
-| Auth (Argon2id, JWT) | `apps/api/app/core/security.py`, `apps/api/app/services/user_service.py` |
+| Auth (Supabase Auth) | `apps/api/app/core/supabase.py`, `apps/api/app/api/deps.py` |
 | Database / ORM | `apps/api/app/db/session.py`, `apps/api/app/models/*` |
 | Migrations | `apps/api/app/migrations/` |
 | Route parsing | `apps/api/app/services/route_parser.py` |

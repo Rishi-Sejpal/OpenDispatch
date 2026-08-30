@@ -44,7 +44,7 @@ describe('Login', () => {
   });
 
   it('calls login and navigates home on success', async () => {
-    vi.mocked(login).mockResolvedValue({ access_token: 'a', refresh_token: 'b' });
+    vi.mocked(login).mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={['/login']}>

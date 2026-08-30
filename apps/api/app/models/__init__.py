@@ -109,10 +109,12 @@ class FixRole(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
+    # ``id`` matches the Supabase auth user uuid. We never mint a local
+    # password; the row is auto-provisioned the first time a Supabase user
+    # successfully calls the API.
     id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=_uuid)
     email: Mapped[str] = mapped_column(String(254), unique=True, nullable=False, index=True)
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -123,24 +125,6 @@ class User(Base):
     )
 
     memberships: Mapped[list["OrganizationMember"]] = relationship(back_populates="user")
-    sessions: Mapped[list["UserSession"]] = relationship(back_populates="user")
-
-
-class UserSession(Base):
-    __tablename__ = "user_sessions"
-
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=_uuid)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
-    )
-    refresh_jti: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
-    user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    ip_address: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=_now)
-
-    user: Mapped[User] = relationship(back_populates="sessions")
 
 
 # ------------------------------------------------------------------ orgs

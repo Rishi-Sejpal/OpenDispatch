@@ -6,13 +6,25 @@ This is a planning tool. It is **not** a substitute for certified aircraft perfo
 
 ## Quickstart
 
-```bash
-cp .env.example .env
-docker compose up -d --build
-# wait for the api container to finish booting
-make seed
-open http://localhost:5173
-```
+1. Create a Supabase project (Postgres + Auth) and fill in `.env`:
+
+   ```bash
+   cp .env.example .env
+   # edit .env: set DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY,
+   # SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET
+   ```
+
+   See **`docs/SUPABASE.md`** for the full provisioning walk-through.
+
+2. Bring the stack up:
+
+   ```bash
+   docker compose up -d --build
+   make migrate   # alembic upgrade head
+   make seed      # loads AIRAC 2608 + global nav + the default superuser
+   ```
+
+3. Open <http://localhost:5173> and sign in.
 
 ## Default developer account
 

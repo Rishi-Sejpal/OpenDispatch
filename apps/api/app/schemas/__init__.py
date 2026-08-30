@@ -1,6 +1,6 @@
 """Pydantic schemas (request/response models) for the API."""
 
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse
+from app.schemas.auth import BootstrapOrganizationRequest, UserResponse
 from app.schemas.common import HealthResponse, PageMeta
 from app.schemas.flight_plan import (
     FlightPlanCreate,
@@ -28,9 +28,7 @@ from app.schemas.route import RouteParseRequest, RouteParseResponse, RouteLeg, R
 from app.schemas.weather import WeatherRead, WeatherSummary
 
 __all__ = [
-    "LoginRequest",
-    "RegisterRequest",
-    "TokenResponse",
+    "BootstrapOrganizationRequest",
     "UserResponse",
     "HealthResponse",
     "PageMeta",

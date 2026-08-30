@@ -49,11 +49,10 @@ RUN pip install --upgrade pip \
         redis==5.2.0 \
         celery==5.4.0 \
         'python-jose[cryptography]==3.3.0' \
-        'passlib[argon2]==1.7.4' \
-        argon2-cffi==23.1.0 \
         python-multipart==0.0.20 \
         email-validator==2.2.0 \
         httpx==0.28.0 \
+        'supabase>=2.6,<3' \
         jinja2==3.1.4 \
         weasyprint==63.1 \
         structlog==24.4.0 \

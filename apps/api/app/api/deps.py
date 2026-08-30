@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import Depends, Header, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.errors import ForbiddenError, UnauthorizedError
-from app.core.security import decode_token, get_request_id, new_request_id
+from app.core.security import new_request_id
+from app.core.supabase import verify_supabase_jwt
 from app.db.session import get_db
 from app.models import Organization, OrganizationMember, User, UserRole
-from app.services import user_service
 
 
 def require_request_id(request: Request) -> str:
@@ -27,22 +28,53 @@ def _extract_bearer(authorization: str | None) -> str:
     return authorization.split(" ", 1)[1].strip()
 
 
+def _upsert_user_from_claims(db: Session, claims: dict) -> User:
+    """Provision (or refresh) a local ``users`` row from a verified Supabase
+    JWT. The first time a Supabase user calls the API, we create a matching
+    row here. Subsequent calls keep the row in sync with the most recent
+    email and metadata.
+    """
+    try:
+        user_id = uuid.UUID(claims["sub"])
+    except (KeyError, ValueError, TypeError) as exc:
+        raise UnauthorizedError("Invalid token subject.") from exc
+
+    user = db.get(User, user_id)
+    email = (claims.get("email") or "").strip().lower()
+    metadata = claims.get("user_metadata") or {}
+    app_metadata = claims.get("app_metadata") or {}
+    full_name = (metadata.get("full_name") or email.split("@")[0] or "User")[:200]
+    is_superuser = bool(app_metadata.get("is_superuser"))
+    is_email_verified = bool(claims.get("email_verified"))
+
+    if user is None:
+        user = User(
+            id=user_id,
+            email=email,
+            full_name=full_name,
+            is_superuser=is_superuser,
+            is_email_verified=is_email_verified,
+        )
+        db.add(user)
+        db.flush()
+    else:
+        user.email = email or user.email
+        if metadata.get("full_name"):
+            user.full_name = (metadata["full_name"])[:200]
+        user.is_superuser = is_superuser
+        user.is_email_verified = is_email_verified
+    user.last_login_at = datetime.now(tz=timezone.utc)
+    db.commit()
+    return user
+
+
 def get_current_user(
     authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),
 ) -> User:
     token = _extract_bearer(authorization)
-    payload = decode_token(token)
-    if payload.get("type") != "access":
-        raise UnauthorizedError("Wrong token type.")
-    sub = payload.get("sub")
-    if not sub:
-        raise UnauthorizedError("Token missing subject.")
-    try:
-        user_id = uuid.UUID(sub)
-    except (ValueError, TypeError) as exc:
-        raise UnauthorizedError("Invalid token subject.") from exc
-    return user_service.get_user_by_id(db, user_id)
+    claims = verify_supabase_jwt(token)
+    return _upsert_user_from_claims(db, claims)
 
 
 def get_optional_user(

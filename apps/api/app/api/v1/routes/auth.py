@@ -1,90 +1,82 @@
-"""Auth endpoints."""
+"""Auth endpoints.
+
+Supabase owns credentials and issues access tokens. The backend only verifies
+Supabase-issued JWTs and exposes a couple of convenience endpoints for the
+frontend to bootstrap a workspace and fetch the current user.
+"""
 
 from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
-from app.core.errors import ConflictError, UnauthorizedError
-from app.core.security import decode_token
+from app.core.errors import ConflictError
 from app.db.session import get_db
-from app.models import User, UserSession
-from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse
-from app.services import audit, user_service
+from app.models import Organization, OrganizationMember, User, UserRole
+from app.schemas import BootstrapOrganizationRequest, UserResponse
+from app.services import audit
 
 router = APIRouter()
 
 
-def _client_info(request: Request, user_agent: str | None) -> tuple[str | None, str | None]:
-    return (request.client.host if request.client else None, user_agent)
+@router.post("/bootstrap", response_model=UserResponse)
+def bootstrap_organization(
+    payload: BootstrapOrganizationRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> User:
+    """Create the caller's first organization and add them as owner.
 
-
-@router.post("/register", response_model=UserResponse, status_code=201)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> User:
-    user = user_service.create_user(
-        db,
-        email=payload.email,
-        password=payload.password,
-        full_name=payload.full_name,
+    Called by the frontend right after a successful Supabase sign-up so that
+    subsequent calls (flight plans, aircraft, etc.) have an organization to
+    attach to. Idempotent: if the user already belongs to an organization the
+    first one is returned and no new organization is created.
+    """
+    existing = db.scalar(
+        select(OrganizationMember).where(OrganizationMember.user_id == user.id)
     )
-    if payload.organization_name:
-        user_service.create_default_organization(db, user, payload.organization_name)
-    audit.log_event(db, action="user.registered", actor_user_id=user.id, target_type="user", target_id=str(user.id))
+    if existing is not None:
+        return user
+
+    base_slug = (
+        payload.organization_name.lower().replace(" ", "-") or f"org-{user.id.hex[:8]}"
+    )[:80]
+    slug = base_slug
+    counter = 1
+    while db.scalar(select(Organization).where(Organization.slug == slug)):
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+    org = Organization(
+        name=payload.organization_name,
+        slug=slug,
+        default_fuel_policy={
+            "taxi_kg": 200,
+            "contingency_percent": 0.05,
+            "final_reserve_minutes": 30,
+            "extra_kg": 0,
+            "additional_kg": 0,
+        },
+    )
+    db.add(org)
+    db.flush()
+    db.add(OrganizationMember(organization_id=org.id, user_id=user.id, role=UserRole.OWNER))
+    audit.log_event(
+        db,
+        action="organization.created",
+        actor_user_id=user.id,
+        organization_id=org.id,
+        target_type="organization",
+        target_id=str(org.id),
+    )
     db.commit()
     db.refresh(user)
     return user
-
-
-@router.post("/login", response_model=TokenResponse)
-def login(
-    payload: LoginRequest,
-    request: Request,
-    user_agent: str | None = Header(default=None),
-    db: Session = Depends(get_db),
-) -> TokenResponse:
-    user = user_service.authenticate(db, payload.email, payload.password)
-    ip, ua = _client_info(request, user_agent)
-    tokens = user_service.issue_tokens(db, user, user_agent=ua, ip_address=ip)
-    audit.log_event(
-        db,
-        action="user.login",
-        actor_user_id=user.id,
-        target_type="user",
-        target_id=str(user.id),
-        ip_address=ip,
-        user_agent=ua,
-    )
-    db.commit()
-    return TokenResponse(**tokens)
-
-
-@router.post("/refresh", response_model=TokenResponse)
-def refresh(
-    refresh_token: str,
-    request: Request,
-    user_agent: str | None = Header(default=None),
-    db: Session = Depends(get_db),
-) -> TokenResponse:
-    payload = decode_token(refresh_token)
-    if payload.get("type") != "refresh":
-        raise UnauthorizedError("Wrong token type.")
-    jti = payload.get("jti")
-    sess = db.scalar(select(UserSession).where(UserSession.refresh_jti == jti))
-    if sess is None or sess.revoked_at is not None:
-        raise UnauthorizedError("Refresh token revoked.")
-    user = db.get(User, uuid.UUID(payload["sub"]))
-    if user is None or not user.is_active:
-        raise UnauthorizedError("User not found or inactive.")
-    sess.revoked_at = __import__("datetime").datetime.now(tz=__import__("datetime").timezone.utc)
-    ip, ua = _client_info(request, user_agent)
-    tokens = user_service.issue_tokens(db, user, user_agent=ua, ip_address=ip)
-    db.commit()
-    return TokenResponse(**tokens)
 
 
 @router.post("/logout", status_code=204, response_class=Response)
@@ -93,11 +85,10 @@ def logout(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> Response:
-    # Revoke all sessions for this user (simple default)
-    from datetime import datetime, timezone
-
-    for sess in db.scalars(select(UserSession).where(UserSession.user_id == user.id)).all():
-        sess.revoked_at = datetime.now(tz=timezone.utc)
+    """Record a logout event. The actual session is cleared client-side via
+    ``supabase.auth.signOut()``; this endpoint is here so the audit trail
+    matches the previous behavior.
+    """
     audit.log_event(
         db,
         action="user.logout",
