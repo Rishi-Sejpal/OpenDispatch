@@ -87,24 +87,22 @@ def isa_temp_at_altitude(altitude_ft: float) -> float:
 
 
 def mach_to_tas_kts(mach: float, altitude_ft: float) -> float:
-    """Convert Mach number to TAS in knots. Simple linear model.
+    """Convert Mach number to TAS in knots.
 
-    TAS = Mach * speed of sound.
-    Speed of sound = sqrt(gamma * R * T) where T in Kelvin.
-    Using a simplified linear model: TAS_kts ≈ 661.47 - altitude_ft * 0.0018 (rough).
-    For higher fidelity use: a = 38.9678546 * sqrt(T_Kelvin), TAS = mach * a / 0.514444.
+    Speed of sound: a = sqrt(gamma * R * T) where gamma=1.4, R=287.0528 J/(kg*K).
+    At ISA sea level (T=288.15K), a = 340.29 m/s.
     """
     t_c = isa_temp_at_altitude(altitude_ft)
     t_k = t_c + 273.15
-    speed_of_sound_mps = 38.9678546 * (t_k**0.5)
-    speed_of_sound_kt = speed_of_sound_mps / 0.514444
+    speed_of_sound_mps = (1.4 * 287.0528 * t_k) ** 0.5  # m/s
+    speed_of_sound_kt = speed_of_sound_mps / 0.5144444  # m/s -> kt
     return mach * speed_of_sound_kt
 
 
 def tas_to_mach(tas_kts: float, altitude_ft: float) -> float:
     t_c = isa_temp_at_altitude(altitude_ft)
     t_k = t_c + 273.15
-    speed_of_sound_kt = 38.9678546 * (t_k**0.5) / 0.514444
+    speed_of_sound_kt = ((1.4 * 287.0528 * t_k) ** 0.5) / 0.5144444
     if speed_of_sound_kt <= 0:
         return 0.0
     return tas_kts / speed_of_sound_kt

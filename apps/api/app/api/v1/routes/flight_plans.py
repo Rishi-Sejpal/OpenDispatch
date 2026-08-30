@@ -382,6 +382,7 @@ def generate_documents(
             template_version=pdf_renderer.TEMPLATE_VERSION,
         )
         db.add(doc)
+        db.flush()
         generated.append(
             {
                 "id": str(doc.id),

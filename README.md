@@ -18,7 +18,7 @@ open http://localhost:5173
 
 After `make seed`:
 
-- email: `dispatch@opendispatch.local`
+- email: `dispatch@opendispatch.example.com`
 - password: `dispatch123!`
 
 ## Architecture

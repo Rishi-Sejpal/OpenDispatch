@@ -38,6 +38,7 @@ from app.models import (
     FlightPlanLeg,
     FlightPlanStatus,
     FlightPlanWarning,
+    FlightPlanWeight,
     Procedure,
     ProcedureKind,
     Runway,

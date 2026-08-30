@@ -57,18 +57,18 @@ def _tas_for_mach(aircraft: AircraftType, altitude_ft: int) -> float:
 
 
 def _ground_speed(tas_kts: float, course_deg: float, wind_dir: float, wind_speed: float) -> float:
-    # Wind direction = direction wind is coming from
+    """Compute ground speed given TAS, true course, and wind from direction.
+
+    Wind convention: `wind_dir` is the direction the wind is coming FROM (meteorological).
+    With a wind FROM 270° blowing TOWARD 90° (east), and a course of 90° (east),
+    the wind is a pure headwind: GS = TAS - wind_speed.
+    """
     course_rad = math.radians(course_deg)
     wind_rad = math.radians(wind_dir)
-    wca = 0.0  # ignoring wind correction angle for simplicity
-    head = -wind_speed * math.cos(wind_rad - course_rad)
-    cross = wind_speed * math.sin(wind_rad - course_rad)
-    # Headwind component positive when against course direction
-    gs = tas_kts - (-head)  # if head>0 (against), gs = tas - head
-    # Simpler: gs = tas - headwind
-    headwind = wind_speed * math.cos(wind_rad - course_rad)
-    gs_simple = tas_kts - headwind
-    return max(50.0, gs_simple)
+    # Headwind = component of wind opposing the course direction
+    headwind = -wind_speed * math.cos(wind_rad - course_rad)
+    gs = tas_kts - headwind
+    return max(50.0, gs)
 
 
 def calculate_climb(

@@ -82,7 +82,17 @@ def list_procedures(
             raise NotFoundError(f"Unknown procedure kind: {kind}") from exc
         stmt = stmt.where(Procedure.kind == kind_enum)
     stmt = stmt.order_by(Procedure.kind, Procedure.name, Procedure.runway_ident)
-    return [ProcedureSummary.model_validate(p) for p in db.scalars(stmt).all()]
+    rows = list(db.execute(stmt).all())
+    return [
+        ProcedureSummary(
+            id=p.id,
+            airport_icao=ap.icao,
+            name=p.name,
+            kind=p.kind.value,
+            runway_ident=p.runway_ident,
+        )
+        for (p,) in rows
+    ]
 
 
 @router.get("/procedures/{procedure_id}", response_model=ProcedureRead)

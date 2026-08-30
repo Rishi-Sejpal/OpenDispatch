@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     storage_backend: Literal["local"] = "local"
     storage_local_path: str = "/var/opendispatch/storage"
 
-    seed_user_email: str = "dispatch@opendispatch.local"
+    seed_user_email: str = "dispatch@opendispatch.example.com"
     seed_user_password: str = "dispatch123!"
     seed_user_name: str = "Dispatch Operator"
 

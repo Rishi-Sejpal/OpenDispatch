@@ -74,6 +74,10 @@ def parse_route(text: str) -> ParseResult:
     # and the next ident is leave; everything between two idents is implicit DCT
     while i < len(tokens):
         t = tokens[i]
+        if t in {"DCT"}:
+            # DCT between two fixes means "direct routing"; tokens remain implicit
+            i += 1
+            continue
         if t in {"SID", "STAR", "APP", "APPR"}:
             # procedures are not represented in route string; skip with a note
             result.errors.append(f"Procedure keyword '{t}' is not part of the route string.")

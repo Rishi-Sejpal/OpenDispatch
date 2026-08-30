@@ -53,7 +53,7 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       LOG_JSON: ${LOG_JSON:-true}
       APP_ENV: ${APP_ENV:-development}
-      SEED_USER_EMAIL: ${SEED_USER_EMAIL:-dispatch@opendispatch.local}
+      SEED_USER_EMAIL: ${SEED_USER_EMAIL:-dispatch@opendispatch.example.com}
       SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-dispatch123!}
       SEED_USER_NAME: ${SEED_USER_NAME:-Dispatch Operator}
     ports:

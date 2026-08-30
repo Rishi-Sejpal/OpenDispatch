@@ -244,6 +244,8 @@ class Airport(Base):
     has_procedures: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     attributes: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
 
+    runways: Mapped[list["Runway"]] = relationship(back_populates="airport", cascade="all, delete-orphan")
+
     __table_args__ = (
         UniqueConstraint("airac_cycle_id", "icao", name="uq_airport_cycle_icao"),
         Index("ix_airports_location", "location", postgresql_using="gist"),
@@ -268,8 +270,10 @@ class Runway(Base):
     surface: Mapped[str] = mapped_column(String(40), nullable=False, default="ASP")
     elevation_ft: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     ils_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    ils_category: Mapped[str | None] = mapped_column(String(4), nullable=True)  # CAT I/II/III
+    ils_category: Mapped[str | None] = mapped_column(String(4), nullable=True)
     lighting: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    airport: Mapped["Airport"] = relationship(back_populates="runways")
 
     __table_args__ = (UniqueConstraint("airport_id", "ident", name="uq_runway_airport_ident"),)
 
