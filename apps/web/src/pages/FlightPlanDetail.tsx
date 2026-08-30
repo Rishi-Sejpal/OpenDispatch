@@ -1,13 +1,28 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useFlightPlan, useCalculateFlightPlan, useDispatchFlightPlan, useGenerateDocuments, useAirport } from '../lib/queries';
-import { formatDuration, formatIso, formatKg, formatLb, formatNm, formatKt, formatLatLon, formatFt } from '../lib/format';
+import {
+  useFlightPlan,
+  useCalculateFlightPlan,
+  useDispatchFlightPlan,
+  useGenerateDocuments,
+  useAirport,
+} from '../lib/queries';
+import { formatDuration, formatIso, formatKg, formatNm, formatKt, formatFt } from '../lib/format';
 import { FlightMap } from '../components/FlightMap';
 import toast from 'react-hot-toast';
 import { extractError } from '../lib/api';
 import { LiveSummary } from '../components/LiveSummary';
 
-type Tab = 'summary' | 'route' | 'navlog' | 'fuel' | 'weights' | 'weather' | 'procedures' | 'warnings' | 'documents';
+type Tab =
+  | 'summary'
+  | 'route'
+  | 'navlog'
+  | 'fuel'
+  | 'weights'
+  | 'weather'
+  | 'procedures'
+  | 'warnings'
+  | 'documents';
 
 export default function FlightPlanDetail() {
   const { id } = useParams<{ id: string }>();
@@ -62,18 +77,27 @@ export default function FlightPlanDetail() {
             {p.callsign || p.departure_icao + ' → ' + p.arrival_icao}
           </h1>
           <div className="text-sm text-slate-400">
-            <span className="font-mono">{p.id.slice(0, 8)}</span> · <span className="chip-info">{p.status}</span> ·{' '}
-            AIRAC {p.airac_cycle} · engine v{p.calculation_engine_version}
+            <span className="font-mono">{p.id.slice(0, 8)}</span> ·{' '}
+            <span className="chip-info">{p.status}</span> · AIRAC {p.airac_cycle} · engine v
+            {p.calculation_engine_version}
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={onCalculate} disabled={calculate.isPending || p.status === 'DISPATCHED'} className="btn-secondary">
+          <button
+            onClick={onCalculate}
+            disabled={calculate.isPending || p.status === 'DISPATCHED'}
+            className="btn-secondary"
+          >
             Recalculate
           </button>
           <button onClick={onGen} disabled={genDocs.isPending} className="btn-secondary">
             Generate PDFs
           </button>
-          <button onClick={onDispatch} disabled={dispatch.isPending || p.status === 'DISPATCHED' || critical > 0} className="btn-primary">
+          <button
+            onClick={onDispatch}
+            disabled={dispatch.isPending || p.status === 'DISPATCHED' || critical > 0}
+            className="btn-primary"
+          >
             {p.status === 'DISPATCHED' ? 'Dispatched ✓' : 'Dispatch'}
           </button>
         </div>
@@ -89,25 +113,37 @@ export default function FlightPlanDetail() {
         <div className="col-span-2">
           <div className="bg-bg-panel border border-bg-line rounded-md">
             <div className="flex border-b border-bg-line text-sm">
-              {(['summary', 'route', 'navlog', 'fuel', 'weights', 'weather', 'procedures', 'warnings', 'documents'] as Tab[]).map(
-                (t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTab(t)}
-                    className={
-                      'px-3 py-2 ' +
-                      (tab === t ? 'border-b-2 border-accent text-accent' : 'text-slate-400 hover:text-white')
-                    }
-                  >
-                    {t}
-                    {t === 'warnings' && p.warnings.length > 0 && (
-                      <span className="ml-1 text-[10px] bg-bg-line px-1.5 py-0.5 rounded">
-                        {p.warnings.length}
-                      </span>
-                    )}
-                  </button>
-                )
-              )}
+              {(
+                [
+                  'summary',
+                  'route',
+                  'navlog',
+                  'fuel',
+                  'weights',
+                  'weather',
+                  'procedures',
+                  'warnings',
+                  'documents',
+                ] as Tab[]
+              ).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={
+                    'px-3 py-2 ' +
+                    (tab === t
+                      ? 'border-b-2 border-accent text-accent'
+                      : 'text-slate-400 hover:text-white')
+                  }
+                >
+                  {t}
+                  {t === 'warnings' && p.warnings.length > 0 && (
+                    <span className="ml-1 text-[10px] bg-bg-line px-1.5 py-0.5 rounded">
+                      {p.warnings.length}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
             <div className="p-4">
               {tab === 'summary' && <SummaryTab plan={p} />}
@@ -125,7 +161,12 @@ export default function FlightPlanDetail() {
         <div className="space-y-3">
           <LiveSummary plan={p} cycle={p.airac_cycle} />
           <div className="bg-bg-panel border border-bg-line rounded-md overflow-hidden">
-            <FlightMap legs={p.legs} dep={dep.data || null} arr={arr.data || null} alternates={p.alternate_icaos} />
+            <FlightMap
+              legs={p.legs}
+              dep={dep.data || null}
+              arr={arr.data || null}
+              alternates={p.alternate_icaos}
+            />
           </div>
         </div>
       </div>
@@ -145,7 +186,10 @@ function SummaryTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
       <Field label="SID" value={plan.sid_id?.slice(0, 8) || '—'} />
       <Field label="STAR" value={plan.star_id?.slice(0, 8) || '—'} />
       <Field label="Approach" value={plan.approach_id?.slice(0, 8) || '—'} />
-      <Field label="Aircraft" value={plan.aircraft_registration || plan.aircraft_type_icao || '—'} />
+      <Field
+        label="Aircraft"
+        value={plan.aircraft_registration || plan.aircraft_type_icao || '—'}
+      />
       <Field label="Cruise altitude" value={formatFt(plan.cruise_altitude_ft)} />
       <Field label="Cost index" value={String(plan.cost_index)} />
       <Field label="Distance" value={c ? formatNm(c.total_distance_nm) : '—'} />
@@ -237,7 +281,9 @@ function NavLogTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
             <td>{l.course_deg?.toFixed(0) || '—'}</td>
             <td>{l.distance_nm?.toFixed(1) || '—'}</td>
             <td>
-              {l.wind_direction_deg != null ? `${String(l.wind_direction_deg).padStart(3, '0')}/${Math.round(l.wind_speed_kts || 0)}` : '—'}
+              {l.wind_direction_deg != null
+                ? `${String(l.wind_direction_deg).padStart(3, '0')}/${Math.round(l.wind_speed_kts || 0)}`
+                : '—'}
             </td>
             <td>{l.true_air_speed_kts?.toFixed(0) || '—'}</td>
             <td>{l.ground_speed_kts?.toFixed(0) || '—'}</td>
@@ -257,7 +303,8 @@ function NavLogTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
 
 function FuelTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
   const f = plan.fuel;
-  if (!f) return <div className="text-slate-500 text-sm">No fuel calculation yet. Click Calculate.</div>;
+  if (!f)
+    return <div className="text-slate-500 text-sm">No fuel calculation yet. Click Calculate.</div>;
   return (
     <table className="w-full od-table text-sm">
       <thead>
@@ -300,7 +347,10 @@ function Row({ k, v }: { k: string; v: number }) {
 
 function WeightsTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
   const w = plan.weights;
-  if (!w) return <div className="text-slate-500 text-sm">No weight calculation yet. Click Calculate.</div>;
+  if (!w)
+    return (
+      <div className="text-slate-500 text-sm">No weight calculation yet. Click Calculate.</div>
+    );
   return (
     <table className="w-full od-table text-sm">
       <thead>
@@ -344,9 +394,8 @@ function WeightsTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
 function WeatherTab({ plan: _plan }: { plan: import('../lib/types').FlightPlan }) {
   return (
     <div className="text-sm text-slate-400">
-      Weather snapshot is captured at calculation time and stored on the plan. The
-      local provider returns deterministic synthetic data so the application works
-      without internet access.
+      Weather snapshot is captured at calculation time and stored on the plan. The local provider
+      returns deterministic synthetic data so the application works without internet access.
     </div>
   );
 }
@@ -354,8 +403,12 @@ function WeatherTab({ plan: _plan }: { plan: import('../lib/types').FlightPlan }
 function ProceduresTab({ plan: _plan }: { plan: import('../lib/types').FlightPlan }) {
   return (
     <div className="text-sm text-slate-400">
-      Procedures are stored separately in the navigation database and referenced
-      from the flight plan by ID. Browse them under <Link to="/airports" className="text-accent hover:underline">Airports</Link>.
+      Procedures are stored separately in the navigation database and referenced from the flight
+      plan by ID. Browse them under{' '}
+      <Link to="/airports" className="text-accent hover:underline">
+        Airports
+      </Link>
+      .
     </div>
   );
 }
@@ -384,8 +437,8 @@ function DocumentsTab({ plan }: { plan: import('../lib/types').FlightPlan }) {
   if (plan.documents.length === 0) {
     return (
       <div className="text-sm text-slate-500">
-        No documents yet. Click "Generate PDFs" to create OFP, navigation log, fuel
-        summary, and weight summary.
+        No documents yet. Click "Generate PDFs" to create OFP, navigation log, fuel summary, and
+        weight summary.
       </div>
     );
   }

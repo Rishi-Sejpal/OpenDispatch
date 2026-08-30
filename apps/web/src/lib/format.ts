@@ -35,7 +35,10 @@ export function formatIso(dt: string | null | undefined): string {
   return new Date(dt).toISOString().replace('T', ' ').slice(0, 16) + 'Z';
 }
 
-export function formatLatLon(lat: number | null | undefined, lon: number | null | undefined): string {
+export function formatLatLon(
+  lat: number | null | undefined,
+  lon: number | null | undefined,
+): string {
   if (lat == null || lon == null) return '—';
   const ns = lat >= 0 ? 'N' : 'S';
   const ew = lon >= 0 ? 'E' : 'W';

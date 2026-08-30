@@ -32,17 +32,21 @@ export default function FlightPlans() {
           </thead>
           <tbody>
             {plans.data?.map((p) => (
-              <tr key={p.id} onClick={() => (window.location.href = `/flight-plans/${p.id}`)} className="cursor-pointer">
+              <tr
+                key={p.id}
+                onClick={() => (window.location.href = `/flight-plans/${p.id}`)}
+                className="cursor-pointer"
+              >
                 <td>
                   <span
                     className={
                       p.status === 'DISPATCHED'
                         ? 'chip-ok'
                         : p.status === 'DRAFT'
-                        ? 'chip-warn'
-                        : p.status === 'ARCHIVED'
-                        ? 'chip-info'
-                        : 'chip-info'
+                          ? 'chip-warn'
+                          : p.status === 'ARCHIVED'
+                            ? 'chip-info'
+                            : 'chip-info'
                     }
                   >
                     {p.status}

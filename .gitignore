@@ -31,3 +31,4 @@ apps/web/node_modules
 *.tsbuildinfo
 tests/e2e/test-results/
 tests/e2e/playwright-report/
+coverage

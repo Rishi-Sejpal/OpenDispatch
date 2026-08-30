@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +15,6 @@ import {
   useFlightPlan,
 } from '../lib/queries';
 import { extractError } from '../lib/api';
-import { formatKg, formatNm, formatDuration } from '../lib/format';
 import { LiveSummary } from '../components/LiveSummary';
 import { RouteEditor } from '../components/RouteEditor';
 
@@ -61,13 +60,7 @@ export default function NewFlightPlan() {
   const dispatch = useDispatchFlightPlan();
   const genDocs = useGenerateDocuments();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       departure_icao: 'VABB',
@@ -149,9 +142,7 @@ export default function NewFlightPlan() {
       <div className="mb-4 flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold">New Flight Plan</h1>
-          <div className="text-sm text-slate-400">
-            Fill the sections, calculate, then dispatch.
-          </div>
+          <div className="text-sm text-slate-400">Fill the sections, calculate, then dispatch.</div>
         </div>
         <div className="text-xs text-slate-500">
           {plan.data && (
@@ -174,7 +165,11 @@ export default function NewFlightPlan() {
               </div>
               <div>
                 <label className="label">Scheduled off-block (UTC)</label>
-                <input className="input" type="datetime-local" {...register('scheduled_off_block')} />
+                <input
+                  className="input"
+                  type="datetime-local"
+                  {...register('scheduled_off_block')}
+                />
               </div>
             </div>
           </Section>
@@ -204,11 +199,15 @@ export default function NewFlightPlan() {
           <Section title="Payload">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label" htmlFor="od-pax">Passengers</label>
+                <label className="label" htmlFor="od-pax">
+                  Passengers
+                </label>
                 <input id="od-pax" className="input" type="number" {...register('passengers')} />
               </div>
               <div>
-                <label className="label" htmlFor="od-cargo">Cargo (kg)</label>
+                <label className="label" htmlFor="od-cargo">
+                  Cargo (kg)
+                </label>
                 <input id="od-cargo" className="input" type="number" {...register('cargo_kg')} />
               </div>
             </div>
@@ -268,7 +267,7 @@ export default function NewFlightPlan() {
                     e.target.value
                       .split(',')
                       .map((s) => s.trim().toUpperCase())
-                      .filter(Boolean)
+                      .filter(Boolean),
                   )
                 }
               />
@@ -301,18 +300,23 @@ export default function NewFlightPlan() {
 
           {/* Route */}
           <Section title="Route">
-            <RouteEditor
-              value={v.route_text || ''}
-              onChange={(r) => setValue('route_text', r)}
-            />
+            <RouteEditor value={v.route_text || ''} onChange={(r) => setValue('route_text', r)} />
           </Section>
 
           {/* Cruise */}
           <Section title="Cruise">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label" htmlFor="od-cruise-alt">Cruise altitude (ft)</label>
-                <input id="od-cruise-alt" className="input" type="number" step={1000} {...register('cruise_altitude_ft')} />
+                <label className="label" htmlFor="od-cruise-alt">
+                  Cruise altitude (ft)
+                </label>
+                <input
+                  id="od-cruise-alt"
+                  className="input"
+                  type="number"
+                  step={1000}
+                  {...register('cruise_altitude_ft')}
+                />
               </div>
             </div>
           </Section>
@@ -325,10 +329,20 @@ export default function NewFlightPlan() {
               </button>
             ) : (
               <>
-                <button type="button" onClick={onCalculate} disabled={calculate.isPending} className="btn-primary">
+                <button
+                  type="button"
+                  onClick={onCalculate}
+                  disabled={calculate.isPending}
+                  className="btn-primary"
+                >
                   {calculate.isPending ? 'Calculating…' : 'Calculate'}
                 </button>
-                <button type="button" onClick={onGenerate} disabled={genDocs.isPending} className="btn-secondary">
+                <button
+                  type="button"
+                  onClick={onGenerate}
+                  disabled={genDocs.isPending}
+                  className="btn-secondary"
+                >
                   {genDocs.isPending ? 'Generating…' : 'Generate documents'}
                 </button>
                 <button
@@ -357,7 +371,9 @@ export default function NewFlightPlan() {
               <div className="space-y-1">
                 {plan.data.warnings.map((w, i) => (
                   <div key={i} className={`bann-${w.severity.toLowerCase()}`}>
-                    <div className="font-mono text-[10px]">{w.severity} · {w.code}</div>
+                    <div className="font-mono text-[10px]">
+                      {w.severity} · {w.code}
+                    </div>
                     <div className="text-xs">{w.message}</div>
                   </div>
                 ))}
@@ -390,7 +406,9 @@ function AirportPicker(props: {
 }) {
   return (
     <div>
-      <label className="label" htmlFor={props.id}>{props.label}</label>
+      <label className="label" htmlFor={props.id}>
+        {props.label}
+      </label>
       <input
         id={props.id}
         className="input"
@@ -430,7 +448,11 @@ function RunwayPicker(props: {
   return (
     <div>
       <label className="label">{props.label}</label>
-      <select className="input" value={props.value} onChange={(e) => props.onChange(e.target.value || null)}>
+      <select
+        className="input"
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value || null)}
+      >
         <option value="">— Auto —</option>
         {props.runways.map((r) => (
           <option key={r.ident} value={r.ident}>
@@ -451,7 +473,11 @@ function ProcedurePicker(props: {
   return (
     <div>
       <label className="label">{props.label}</label>
-      <select className="input" value={props.value} onChange={(e) => props.onChange(e.target.value || null)}>
+      <select
+        className="input"
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value || null)}
+      >
         <option value="">— None —</option>
         {props.options.map((p) => (
           <option key={p.id} value={p.id}>

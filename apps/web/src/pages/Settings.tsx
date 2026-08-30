@@ -66,11 +66,10 @@ export default function Settings() {
       <section className="bg-bg-panel border border-bg-line rounded-md p-4">
         <h2 className="font-semibold mb-2">About</h2>
         <div className="text-xs text-slate-400 leading-relaxed">
-          OpenDispatch v0.1.0 · This software provides planning estimates and is not
-          a substitute for certified aircraft performance data, official navigation
-          data, ATC clearance, operational control procedures, or legally required
-          dispatch systems. See ARCHITECTURE.md and AVIATION_CALCULATIONS.md for
-          details on the simplified models used.
+          OpenDispatch v0.1.0 · This software provides planning estimates and is not a substitute
+          for certified aircraft performance data, official navigation data, ATC clearance,
+          operational control procedures, or legally required dispatch systems. See ARCHITECTURE.md
+          and AVIATION_CALCULATIONS.md for details on the simplified models used.
         </div>
       </section>
     </div>

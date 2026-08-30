@@ -56,16 +56,24 @@ export default function Register() {
         <div>
           <label className="label">Full name</label>
           <input className="input" {...register('full_name')} />
-          {errors.full_name && <p className="text-xs text-rose-400 mt-1">{errors.full_name.message}</p>}
+          {errors.full_name && (
+            <p className="text-xs text-rose-400 mt-1">{errors.full_name.message}</p>
+          )}
         </div>
         <div>
           <label className="label">Password</label>
           <input className="input" type="password" {...register('password')} />
-          {errors.password && <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>}
+          {errors.password && (
+            <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
+          )}
         </div>
         <div>
           <label className="label">Organization (optional)</label>
-          <input className="input" placeholder="e.g. Acme Airlines" {...register('organization_name')} />
+          <input
+            className="input"
+            placeholder="e.g. Acme Airlines"
+            {...register('organization_name')}
+          />
         </div>
         <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? 'Creating…' : 'Create account'}

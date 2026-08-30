@@ -34,7 +34,9 @@ export default function Aircraft() {
                   </td>
                   <td className="font-mono">{t.mtow_kg.toFixed(0)}</td>
                   <td>{t.passenger_capacity}</td>
-                  <td className="text-xs">M{t.cruise_mach} / {t.cruise_tas_kts}kt</td>
+                  <td className="text-xs">
+                    M{t.cruise_mach} / {t.cruise_tas_kts}kt
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -63,7 +65,11 @@ export default function Aircraft() {
                   <td>{r.nickname || '—'}</td>
                   <td className="text-xs font-mono">{r.organization_id.slice(0, 8)}</td>
                   <td>
-                    {r.active ? <span className="chip-ok">Active</span> : <span className="chip-warn">Inactive</span>}
+                    {r.active ? (
+                      <span className="chip-ok">Active</span>
+                    ) : (
+                      <span className="chip-warn">Inactive</span>
+                    )}
                   </td>
                 </tr>
               ))}

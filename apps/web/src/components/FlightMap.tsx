@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
+import type { StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { Airport, FlightPlanLeg } from '../lib/types';
 
@@ -35,7 +36,7 @@ export function FlightMap({
           },
         },
         layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
-      } as any,
+      } as StyleSpecification,
       center: [75, 22],
       zoom: 4,
     });

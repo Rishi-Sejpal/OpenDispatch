@@ -26,7 +26,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(err);
-  }
+  },
 );
 
 export interface ApiError {

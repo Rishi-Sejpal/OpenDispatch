@@ -1,19 +1,31 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api, getAccessToken } from './lib/api';
 import { useTheme } from './lib/theme';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import FlightPlans from './pages/FlightPlans';
-import NewFlightPlan from './pages/NewFlightPlan';
-import FlightPlanDetail from './pages/FlightPlanDetail';
-import Airports from './pages/Airports';
-import RoutesPage from './pages/Routes';
-import Aircraft from './pages/Aircraft';
-import Documents from './pages/Documents';
-import Settings from './pages/Settings';
 import { cn } from './lib/cn';
+
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const FlightPlans = lazy(() => import('./pages/FlightPlans'));
+const NewFlightPlan = lazy(() => import('./pages/NewFlightPlan'));
+const FlightPlanDetail = lazy(() => import('./pages/FlightPlanDetail'));
+const Airports = lazy(() => import('./pages/Airports'));
+const RoutesPage = lazy(() => import('./pages/Routes'));
+const Aircraft = lazy(() => import('./pages/Aircraft'));
+const Documents = lazy(() => import('./pages/Documents'));
+const Settings = lazy(() => import('./pages/Settings'));
+
+const LoadingPage = () => (
+  <div className="min-h-screen flex items-center justify-center bg-bg-base text-slate-400">
+    Loading…
+  </div>
+);
+
+function Page({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<LoadingPage />}>{children}</Suspense>;
+}
 
 function NavItem({ to, label }: { to: string; label: string }) {
   const loc = useLocation();
@@ -23,7 +35,9 @@ function NavItem({ to, label }: { to: string; label: string }) {
       to={to}
       className={cn(
         'block px-3 py-1.5 rounded-md text-sm transition',
-        active ? 'bg-accent/15 text-accent border-l-2 border-accent' : 'text-slate-300 hover:bg-bg-card hover:text-white'
+        active
+          ? 'bg-accent/15 text-accent border-l-2 border-accent'
+          : 'text-slate-300 hover:bg-bg-card hover:text-white',
       )}
     >
       {label}
@@ -75,7 +89,11 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <button onClick={toggleTheme} className="btn-ghost flex-1 text-[10px]">
               Theme
             </button>
-            <Link to="/login" className="btn-ghost flex-1 text-[10px]" onClick={() => localStorage.clear()}>
+            <Link
+              to="/login"
+              className="btn-ghost flex-1 text-[10px]"
+              onClick={() => localStorage.clear()}
+            >
               Sign out
             </Link>
           </div>
@@ -94,17 +112,112 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/" element={<ProtectedShell><Dashboard /></ProtectedShell>} />
-      <Route path="/flight-plans" element={<ProtectedShell><FlightPlans /></ProtectedShell>} />
-      <Route path="/flight-plans/new" element={<ProtectedShell><NewFlightPlan /></ProtectedShell>} />
-      <Route path="/flight-plans/:id" element={<ProtectedShell><FlightPlanDetail /></ProtectedShell>} />
-      <Route path="/airports" element={<ProtectedShell><Airports /></ProtectedShell>} />
-      <Route path="/routes" element={<ProtectedShell><RoutesPage /></ProtectedShell>} />
-      <Route path="/aircraft" element={<ProtectedShell><Aircraft /></ProtectedShell>} />
-      <Route path="/documents" element={<ProtectedShell><Documents /></ProtectedShell>} />
-      <Route path="/settings" element={<ProtectedShell><Settings /></ProtectedShell>} />
+      <Route
+        path="/login"
+        element={
+          <Page>
+            <Login />
+          </Page>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <Page>
+            <Register />
+          </Page>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedShell>
+            <Page>
+              <Dashboard />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/flight-plans"
+        element={
+          <ProtectedShell>
+            <Page>
+              <FlightPlans />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/flight-plans/new"
+        element={
+          <ProtectedShell>
+            <Page>
+              <NewFlightPlan />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/flight-plans/:id"
+        element={
+          <ProtectedShell>
+            <Page>
+              <FlightPlanDetail />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/airports"
+        element={
+          <ProtectedShell>
+            <Page>
+              <Airports />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/routes"
+        element={
+          <ProtectedShell>
+            <Page>
+              <RoutesPage />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/aircraft"
+        element={
+          <ProtectedShell>
+            <Page>
+              <Aircraft />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/documents"
+        element={
+          <ProtectedShell>
+            <Page>
+              <Documents />
+            </Page>
+          </ProtectedShell>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedShell>
+            <Page>
+              <Settings />
+            </Page>
+          </ProtectedShell>
+        }
+      />
     </Routes>
   );
 }

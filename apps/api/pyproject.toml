@@ -79,3 +79,5 @@ minversion = "8.0"
 addopts = "-ra -q"
 testpaths = ["tests", "app"]
 pythonpath = ["."]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"

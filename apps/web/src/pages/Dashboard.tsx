@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useFlightPlans, useActiveCycle } from '../lib/queries';
-import { formatIso, formatDuration, formatNm } from '../lib/format';
+import { formatIso } from '../lib/format';
 
 export default function Dashboard() {
   const plans = useFlightPlans();
@@ -22,10 +22,10 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-bg-panel border border-bg-line rounded-md p-4">
-          <div className="text-[10px] uppercase text-slate-400 tracking-wider mb-1">Active AIRAC cycle</div>
-          <div className="text-2xl font-semibold font-mono">
-            {cycle.data?.cycle ?? '—'}
+          <div className="text-[10px] uppercase text-slate-400 tracking-wider mb-1">
+            Active AIRAC cycle
           </div>
+          <div className="text-2xl font-semibold font-mono">{cycle.data?.cycle ?? '—'}</div>
           <div className="text-xs text-slate-500 mt-1">
             {cycle.data
               ? `${formatIso(cycle.data.effective_from)} → ${formatIso(cycle.data.effective_to)}`
@@ -33,7 +33,9 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="bg-bg-panel border border-bg-line rounded-md p-4">
-          <div className="text-[10px] uppercase text-slate-400 tracking-wider mb-1">Total plans</div>
+          <div className="text-[10px] uppercase text-slate-400 tracking-wider mb-1">
+            Total plans
+          </div>
           <div className="text-2xl font-semibold font-mono">{plans.data?.length ?? '—'}</div>
           <div className="text-xs text-slate-500 mt-1">All organizations you belong to</div>
         </div>
@@ -67,17 +69,21 @@ export default function Dashboard() {
           </thead>
           <tbody>
             {plans.data?.slice(0, 10).map((p) => (
-              <tr key={p.id} className="cursor-pointer" onClick={() => (window.location.href = `/flight-plans/${p.id}`)}>
+              <tr
+                key={p.id}
+                className="cursor-pointer"
+                onClick={() => (window.location.href = `/flight-plans/${p.id}`)}
+              >
                 <td>
                   <span
                     className={
                       p.status === 'DISPATCHED'
                         ? 'chip-ok'
                         : p.status === 'DRAFT'
-                        ? 'chip-warn'
-                        : p.status === 'ARCHIVED'
-                        ? 'chip-info'
-                        : 'chip-info'
+                          ? 'chip-warn'
+                          : p.status === 'ARCHIVED'
+                            ? 'chip-info'
+                            : 'chip-info'
                     }
                   >
                     {p.status}

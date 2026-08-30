@@ -46,14 +46,20 @@ export default function Login() {
           <div className="text-sm text-slate-400">Sign in to your dispatch account</div>
         </div>
         <div>
-          <label className="label">Email</label>
-          <input className="input" type="email" autoFocus {...register('email')} />
+          <label className="label" htmlFor="login-email">
+            Email
+          </label>
+          <input id="login-email" className="input" type="email" autoFocus {...register('email')} />
           {errors.email && <p className="text-xs text-rose-400 mt-1">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="label">Password</label>
-          <input className="input" type="password" {...register('password')} />
-          {errors.password && <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>}
+          <label className="label" htmlFor="login-password">
+            Password
+          </label>
+          <input id="login-password" className="input" type="password" {...register('password')} />
+          {errors.password && (
+            <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
+          )}
         </div>
         <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? 'Signing in…' : 'Sign in'}

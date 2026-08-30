@@ -180,10 +180,9 @@ export function useGenerateDocuments() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const r = await api.post<{ documents: { id: string; doc_type: string; file_name: string; size_bytes: number }[] }>(
-        `/flight-plans/${id}/documents`,
-        {}
-      );
+      const r = await api.post<{
+        documents: { id: string; doc_type: string; file_name: string; size_bytes: number }[];
+      }>(`/flight-plans/${id}/documents`, {});
       return r.data;
     },
     onSuccess: (d, id) => qc.invalidateQueries({ queryKey: ['flight-plan', id] }),
@@ -208,7 +207,7 @@ export function useParseRoute() {
     mutationFn: async (route: string) => {
       const r = await api.post<{ legs: unknown[]; total_distance_nm: number; errors: string[] }>(
         '/routes/geometry',
-        { route }
+        { route },
       );
       return r.data;
     },
