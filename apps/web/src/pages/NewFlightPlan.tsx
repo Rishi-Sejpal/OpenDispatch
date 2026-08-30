@@ -204,12 +204,12 @@ export default function NewFlightPlan() {
           <Section title="Payload">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">Passengers</label>
-                <input className="input" type="number" {...register('passengers')} />
+                <label className="label" htmlFor="od-pax">Passengers</label>
+                <input id="od-pax" className="input" type="number" {...register('passengers')} />
               </div>
               <div>
-                <label className="label">Cargo (kg)</label>
-                <input className="input" type="number" {...register('cargo_kg')} />
+                <label className="label" htmlFor="od-cargo">Cargo (kg)</label>
+                <input id="od-cargo" className="input" type="number" {...register('cargo_kg')} />
               </div>
             </div>
           </Section>
@@ -227,6 +227,7 @@ export default function NewFlightPlan() {
                 query={depQuery}
                 setQuery={setDepQuery}
                 options={depAirports.data || []}
+                id="od-airport-dep"
               />
               <AirportPicker
                 label="Destination"
@@ -238,6 +239,7 @@ export default function NewFlightPlan() {
                 query={arrQuery}
                 setQuery={setArrQuery}
                 options={arrAirports.data || []}
+                id="od-airport-arr"
               />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3">
@@ -309,8 +311,8 @@ export default function NewFlightPlan() {
           <Section title="Cruise">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">Cruise altitude (ft)</label>
-                <input className="input" type="number" step={1000} {...register('cruise_altitude_ft')} />
+                <label className="label" htmlFor="od-cruise-alt">Cruise altitude (ft)</label>
+                <input id="od-cruise-alt" className="input" type="number" step={1000} {...register('cruise_altitude_ft')} />
               </div>
             </div>
           </Section>
@@ -384,11 +386,13 @@ function AirportPicker(props: {
   query: string;
   setQuery: (q: string) => void;
   options: { icao: string; name: string; city: string | null }[];
+  id: string;
 }) {
   return (
     <div>
-      <label className="label">{props.label}</label>
+      <label className="label" htmlFor={props.id}>{props.label}</label>
       <input
+        id={props.id}
         className="input"
         value={props.query}
         onChange={(e) => {
