@@ -52,7 +52,7 @@ def _isa_delta(context: PerformanceContext) -> float:
     return context.temperature_c - isa_temp_at_altitude(context.altitude_ft)
 
 
-def _tas_for_mach(aircraft: AircraftType, altitude_ft: int) -> float:
+def _tas_for_mach(aircraft: AircraftType, altitude_ft: float) -> float:
     return mach_to_tas_kts(aircraft.cruise_mach, altitude_ft)
 
 

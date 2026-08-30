@@ -15,7 +15,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import AiracCycle, Airway, Airport, Fix
+from app.models import AiracCycle, Airway, AirwaySegment, Airport, Fix
 from app.services.route_parser import parse_route
 
 
@@ -40,9 +40,7 @@ def _lookup_airport(db: Session, cycle_id, icao: str) -> Optional[Airport]:
     return db.scalar(select(Airport).where(Airport.airac_cycle_id == cycle_id, Airport.icao == icao))
 
 
-def _find_airway_segment(db: Session, cycle_id, airway_ident: str, join: str, leave: str) -> Optional[int]:
-    from app.models import AirwaySegment
-
+def _find_airway_segment(db: Session, cycle_id, airway_ident: str, join: str, leave: str) -> AirwaySegment | None:
     aw = db.scalar(select(Airway).where(Airway.airac_cycle_id == cycle_id, Airway.ident == airway_ident))
     if aw is None:
         return None
@@ -101,7 +99,7 @@ def validate_route(
     for leg in parsed.legs:
         # An airway leg's "ident" is the leave fix; the join fix was the previous leg
         is_airway_leg = leg.leg_type == "AIRWAY"
-        if is_airway_leg and leg.via:
+        if is_airway_leg and leg.via and leg.airway:
             join, leave = leg.via
             aw_seg = _find_airway_segment(db, cycle.id, leg.airway, join, leave)
             if aw_seg is None:

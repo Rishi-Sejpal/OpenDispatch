@@ -63,6 +63,9 @@ services:
       - ./data:/srv/opendispatch/data:ro
       - ./services:/srv/opendispatch/services:ro
       - ./packages:/srv/opendispatch/packages:ro
+      - ./apps/api/tests:/srv/opendispatch/apps/api/tests:ro
+      - ./apps/api/pyproject.toml:/srv/opendispatch/apps/api/pyproject.toml:ro
+      - ./apps/api/alembic.ini:/srv/opendispatch/apps/api/alembic.ini:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
       interval: 10s

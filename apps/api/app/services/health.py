@@ -12,7 +12,7 @@ def check_db() -> bool:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         return True
-    except Exception:  # noqa: BLE001
+    except Exception:
         return False
 
 
@@ -23,5 +23,5 @@ def check_redis() -> bool:
 
         client = redis.Redis.from_url(get_settings().redis_url, socket_connect_timeout=1, socket_timeout=1)
         return bool(client.ping())
-    except Exception:  # noqa: BLE001
+    except Exception:
         return False

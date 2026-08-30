@@ -337,13 +337,13 @@ def load_test_navigation(db, cycle: AiracCycle) -> None:
 
     # Procedures
     for pd in data.get("procedures", []):
-        ap = airports_by_icao.get(pd["airport"])
-        if ap is None:
+        proc_ap = airports_by_icao.get(pd["airport"])
+        if proc_ap is None:
             continue
         existing = db.scalar(
             select(Procedure).where(
                 Procedure.airac_cycle_id == cycle.id,
-                Procedure.airport_id == ap.id,
+                Procedure.airport_id == proc_ap.id,
                 Procedure.name == pd["name"],
                 Procedure.kind == ProcedureKind(pd["kind"]),
                 Procedure.runway_ident == pd.get("runway"),
@@ -354,7 +354,7 @@ def load_test_navigation(db, cycle: AiracCycle) -> None:
         ref_fix = fixes_by_ident.get(pd["reference_fix"]) if pd.get("reference_fix") else None
         proc = Procedure(
             airac_cycle_id=cycle.id,
-            airport_id=ap.id,
+            airport_id=proc_ap.id,
             name=pd["name"],
             kind=ProcedureKind(pd["kind"]),
             runway_ident=pd.get("runway"),
@@ -374,13 +374,13 @@ def load_test_navigation(db, cycle: AiracCycle) -> None:
             )
         # Legs
         for i, ld in enumerate(pd.get("legs", []), start=1):
-            f = fixes_by_ident.get(ld["fix"]) if ld.get("fix") else None
+            leg_fix = fixes_by_ident.get(ld["fix"]) if ld.get("fix") else None
             db.add(
                 ProcedureLeg(
                     procedure_id=proc.id,
                     sequence=i,
                     leg_type=ld["leg_type"],
-                    fix_id=f.id if f else None,
+                    fix_id=leg_fix.id if leg_fix else None,
                     course_deg=ld.get("course_deg"),
                     distance_nm=ld.get("distance_nm"),
                     altitude_ft=ld.get("altitude_ft"),

@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 # Conversions
-NM_PER_KM = 1.852
-KM_PER_NM = 1 / NM_PER_KM
-FT_PER_M = 3.280839895
+# Each constant is named `<UNIT_A>_PER_<UNIT_B>` meaning 1 unit_B == constant unit_A.
+KM_PER_NM = 1.852  # 1 NM = 1.852 km
+NM_PER_KM = 1 / KM_PER_NM
+FT_PER_M = 3.280839895  # 1 m = 3.280839895 ft
 M_PER_FT = 1 / FT_PER_M
-LB_PER_KG = 2.20462262185
+LB_PER_KG = 2.20462262185  # 1 kg = 2.2046 lb
 KG_PER_LB = 1 / LB_PER_KG
-GAL_PER_L = 0.2641720524
-L_PER_GAL = 1 / GAL_PER_L
-KT_PER_KMH = 0.5399568035
-KMH_PER_KT = 1 / KT_PER_KMH
+L_PER_GAL = 3.785411784  # 1 US gal = 3.785 L
+GAL_PER_L = 1 / L_PER_GAL
+KMH_PER_KT = 1.852  # 1 kt = 1.852 km/h
+KT_PER_KMH = 1 / KMH_PER_KT
 KTS_PER_MACH = 661.47  # at sea level, ISA; varies with altitude but useful approximation
 
 # Aviation-specific
@@ -47,11 +48,11 @@ def lb_to_kg(lb: float) -> float:
 
 
 def gal_to_l(g: float) -> float:
-    return g * GAL_PER_L
+    return g * L_PER_GAL
 
 
 def l_to_gal(l: float) -> float:
-    return l * L_PER_GAL
+    return l * GAL_PER_L
 
 
 def kt_to_kmh(kt: float) -> float:

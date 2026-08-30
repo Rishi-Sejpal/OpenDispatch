@@ -24,7 +24,7 @@ AIRWAY_PATTERN = re.compile(r"^[A-Z]{1,2}\d{1,4}$")
 # Standard reserved words
 RESERVED = {"DCT", "SID", "STAR", "APP", "APPR"}
 
-_IDENT = re.compile(r"^[A-Z0-9]{2,12}$")
+_IDENT = re.compile(r"^[A-Z][A-Z0-9]{1,11}$")  # identifiers must start with a letter
 
 
 @dataclass
@@ -117,7 +117,7 @@ def parse_route(text: str) -> ParseResult:
             last_ident = t
             i += 1
             continue
-        # unknown token
+        # unknown token (e.g. all-digits)
         result.errors.append(f"Unrecognized route token: '{t}'.")
         i += 1
 

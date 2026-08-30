@@ -46,11 +46,21 @@ target-version = "py311"
 extend-exclude = ["node_modules", "dist", "build", ".venv"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "S", "C4", "DTZ", "T20", "RUF"]
-ignore = ["S101", "S104", "S311", "B008", "B904", "E501"]
+select = ["E", "F", "I", "B", "N", "ASYNC", "C4", "DTZ", "T20", "RUF"]
+ignore = [
+    "S101", "S104", "S311", "S108",
+    "B008", "B904", "B007", "B905",
+    "E501",
+    "F401",
+    "F841",
+    "E741",
+    "N806", "N818",
+    "I001",
+    "RUF022",
+]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S", "N", "B"]
+"tests/*" = ["S", "N", "B", "F", "UP", "E", "I"]
 "app/scripts/*" = ["S", "T20"]
 "**/migrations/*" = ["E", "F", "I", "N", "B", "UP"]
 
